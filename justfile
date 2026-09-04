@@ -5,4 +5,9 @@ serve:
     go run -tags dev . serve
 
 build:
-    $(cd form-builder && pnpm run build)
+    cd form-builder && pnpm run build
+    go build . -o dist/askep-sync
+
+install:
+    cd form-builder && pnpm run build
+    go install .
