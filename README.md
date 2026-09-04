@@ -1,4 +1,4 @@
-# askep
+# Askep Sync
 
 CLI + web builder untuk mengedit formulir askep (asuhan keperawatan) yang
 tersimpan di tabel `askep_list` — tanpa perlu menulis SQL atau mengedit HTML
@@ -33,7 +33,7 @@ secara manual.
 
 ```bash
 git clone <repo-ini>
-cd medical-form-builder
+cd askep-sync
 
 # 1. bangun frontend (hasilnya masuk ke form-builder/dist)
 just build
