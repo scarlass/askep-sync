@@ -1,0 +1,1063 @@
+{
+  "version": 3,
+  "meta": {
+    "title": "FORMULIR UJI SELURUH KOMPONEN",
+    "docCode": "RM.9.9.9",
+    "showHeader": true,
+    "showFooter": true,
+    "letterSections": true,
+    "formClass": "smart-form",
+    "dataTtd": "yes",
+    "fieldAttr": "myid=\"check_cara\"",
+    "dateClass": "datepickerBoots",
+    "pageWidth": "none",
+    "header": {
+      "showLogo": true,
+      "logoSrc": "{V_PETH}{VLOGO}",
+      "logoWidth": "22mm",
+      "hospitalName": "{RS_NAMA} — Unit Rawat Inap",
+      "addressLines": "{RS_ALAMAT}\nTelp. {RS_TELEPON} | Email {RS_EMAIL}",
+      "showTitle": true,
+      "showDocCode": true,
+      "extraHtml": "Berlaku sejak 1 Januari 2026",
+      "showIdent": true,
+      "identWidth": "80%",
+      "identAlign": "kanan",
+      "identKeyWidth": "1fr",
+      "identValueWidth": "34mm",
+      "identFontSize": "9pt",
+      "everyPage": false,
+      "split": true,
+      "leftWidth": "60%",
+      "rightWidth": "40%",
+      "divider": true,
+      "leftAlign": "kiri",
+      "rightAlign": "kanan",
+      "logoSide": "kiri",
+      "infoSide": "kiri",
+      "titleSide": "kanan",
+      "identSide": "kanan",
+      "ident": [
+        {
+          "key": "No. RM",
+          "type": "static",
+          "value": "{NO_RM}",
+          "field": "",
+          "options": [],
+          "full": false
+        },
+        {
+          "key": "Nama",
+          "type": "static",
+          "value": "{NAME_REAL}",
+          "field": "",
+          "options": [],
+          "full": false
+        },
+        {
+          "key": "Tgl Lahir",
+          "type": "static",
+          "value": "{TGL_LAHIR}",
+          "field": "",
+          "options": [],
+          "full": false
+        },
+        {
+          "key": "Ruang",
+          "type": "static",
+          "value": "{ROOM_NAME}"
+        },
+        {
+          "key": "No. Register",
+          "type": "input",
+          "field": "no_register_kop",
+          "width": "25mm"
+        },
+        {
+          "key": "Tgl Masuk",
+          "type": "date",
+          "field": "tgl_masuk_kop"
+        },
+        {
+          "key": "Tanda tangan penerima",
+          "type": "blank"
+        },
+        {
+          "key": "Keluhan utama",
+          "type": "input",
+          "field": "keluhan_kop",
+          "width": "100%"
+        },
+        {
+          "key": "Terlalu lebar",
+          "type": "input",
+          "field": "lebar_kop",
+          "width": "90mm"
+        },
+        {
+          "key": "Kelas",
+          "type": "options",
+          "field": "kelas_kop",
+          "options": [
+            "I",
+            "II",
+            "III"
+          ],
+          "full": true
+        }
+      ]
+    },
+    "footer": {
+      "align": "rata",
+      "note": "Formulir wajib diisi lengkap dalam 24 jam.",
+      "showPrintDate": true,
+      "everyPage": false,
+      "split": true,
+      "leftWidth": "40%",
+      "rightWidth": "60%",
+      "leftAlign": "kiri",
+      "rightAlign": "kanan",
+      "noteSide": "kiri",
+      "signs": [
+        {
+          "id": "g_mtb0fvlt_3",
+          "role": "Perawat Penanggung Jawab",
+          "place": "Bandung",
+          "withDate": true,
+          "withTime": true,
+          "withSelect": false,
+          "selectField": "",
+          "withName": true,
+          "withPentablet": true,
+          "side": "kanan"
+        },
+        {
+          "id": "g_mtb0fvlt_4",
+          "role": "Dokter DPJP",
+          "place": "Bandung",
+          "withDate": true,
+          "withTime": true,
+          "withSelect": true,
+          "selectField": "dokter_dpjp",
+          "withName": true,
+          "withPentablet": true,
+          "side": "kanan"
+        },
+        {
+          "id": "g_mtb0fvlt_5",
+          "role": "Pasien / Keluarga",
+          "place": "Bandung",
+          "withDate": false,
+          "withTime": true,
+          "withSelect": false,
+          "selectField": "",
+          "withName": true,
+          "withPentablet": false,
+          "side": "kiri"
+        }
+      ]
+    },
+    "paging": {
+      "enabled": true,
+      "label": "Page",
+      "navTop": true,
+      "navBottom": true,
+      "idPrefix": "dokumen_page_",
+      "hiddenClass": "hidden",
+      "functionName": "NextPage",
+      "includeScript": true,
+      "printAll": true
+    }
+  },
+  "sections": [
+    {
+      "id": "s_semua",
+      "title": "Semua Komponen",
+      "page": 1,
+      "rows": [
+        {
+          "id": "r_mtb0fvlt_7",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlt_6",
+              "type": "text",
+              "label": "Label",
+              "field": "uji_text",
+              "required": false,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "width": "",
+              "span": 1,
+              "placeholder": "",
+              "unit": "",
+              "boxed": false,
+              "readOnly": false,
+              "value": ""
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlt_9",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlt_8",
+              "type": "textarea",
+              "label": "Label",
+              "field": "uji_textarea",
+              "required": false,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "width": "",
+              "span": 1,
+              "placeholder": "",
+              "rows": 3,
+              "ruled": false,
+              "boxed": false
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlt_b",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlt_a",
+              "type": "number",
+              "label": "Angka",
+              "field": "uji_number",
+              "required": false,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "width": "80px",
+              "span": 1,
+              "placeholder": "",
+              "unit": "",
+              "min": "",
+              "max": "",
+              "step": "",
+              "boxed": false
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlt_d",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlt_c",
+              "type": "date",
+              "label": "Tanggal",
+              "field": "uji_date",
+              "required": false,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "width": "",
+              "span": 1,
+              "placeholder": "dd-mm-yy",
+              "withTime": false
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlt_f",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlt_e",
+              "type": "time",
+              "label": "Jam",
+              "field": "uji_time",
+              "required": false,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "width": "70px",
+              "span": 1,
+              "placeholder": "hh:mm",
+              "suffix": "WIB"
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlt_h",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlt_g",
+              "type": "daterange",
+              "label": "Periode",
+              "field": "uji_daterange",
+              "required": false,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "width": "120px",
+              "span": 1,
+              "fieldTo": "uji_daterange_akhir",
+              "separator": "s.d."
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlt_j",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlt_i",
+              "type": "select",
+              "label": "Label",
+              "field": "uji_select",
+              "required": false,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "width": "",
+              "span": 1,
+              "options": [
+                "Pilihan 1",
+                "Pilihan 2"
+              ],
+              "firstBlank": "- Pilih -"
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlt_l",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlt_k",
+              "type": "kv",
+              "label": "Label",
+              "field": "uji_kv",
+              "kind": "text",
+              "labelWidth": "160px",
+              "unit": "",
+              "width": "120px",
+              "center": false,
+              "hint": "",
+              "options": [
+                "Ya",
+                "Tidak"
+              ],
+              "value": "",
+              "required": false,
+              "span": 1
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlt_n",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlt_m",
+              "type": "boxes",
+              "label": "No. Rekam Medis",
+              "field": "uji_boxes",
+              "required": false,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "width": "",
+              "span": 1,
+              "count": 8
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlt_p",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlt_o",
+              "type": "static",
+              "label": "Nama Pasien",
+              "value": "{NAME_REAL}",
+              "strong": true,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "span": 1
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlt_r",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlt_q",
+              "type": "hidden",
+              "field": "uji_hidden",
+              "value": "{REGPID}",
+              "span": 1
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlu_t",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlt_s",
+              "type": "checkbox",
+              "label": "Label",
+              "field": "uji_checkbox",
+              "required": false,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "width": "",
+              "span": 1,
+              "options": [
+                "Opsi A",
+                "Opsi B"
+              ],
+              "columns": 0,
+              "otherField": ""
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlu_v",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlu_u",
+              "type": "radio",
+              "label": "Label",
+              "field": "uji_radio",
+              "required": false,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "width": "",
+              "span": 1,
+              "options": [
+                "Ya",
+                "Tidak"
+              ],
+              "columns": 0,
+              "otherField": ""
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlu_x",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlu_w",
+              "type": "checkfill",
+              "label": "Keluhan",
+              "field": "uji_checkfill",
+              "required": false,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "width": "",
+              "span": 1,
+              "items": [
+                {
+                  "text": "Nyeri, lokasi",
+                  "field": "keluhan_nyeri"
+                },
+                {
+                  "text": "Mual",
+                  "field": ""
+                }
+              ],
+              "columns": 0,
+              "fillWidth": "120px"
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlu_z",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlu_y",
+              "type": "scale",
+              "label": "Skala Nyeri",
+              "field": "uji_scale",
+              "required": false,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "width": "",
+              "span": 1,
+              "min": 0,
+              "max": 10,
+              "leftLabel": "Tidak nyeri",
+              "rightLabel": "Nyeri hebat"
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlu_11",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlu_10",
+              "type": "score",
+              "label": "Total Skor",
+              "field": "uji_score",
+              "required": false,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "width": "60px",
+              "span": 1,
+              "unit": "",
+              "note": "0-24 rendah · 25-44 sedang · ≥45 tinggi",
+              "boxed": true,
+              "readOnly": false
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlu_13",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlu_12",
+              "type": "matrix",
+              "title": "",
+              "itemHeader": "Pemeriksaan",
+              "choices": [
+                "Ya",
+                "Tidak"
+              ],
+              "noteColumn": "Keterangan",
+              "items": [
+                {
+                  "text": "Item 1",
+                  "field": "",
+                  "noteField": ""
+                },
+                {
+                  "text": "Item 2",
+                  "field": "",
+                  "noteField": ""
+                }
+              ],
+              "single": true,
+              "span": 1
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlu_15",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlu_14",
+              "type": "table",
+              "columns": [
+                {
+                  "head": "Nama Obat",
+                  "field": "obat",
+                  "width": ""
+                },
+                {
+                  "head": "Dosis",
+                  "field": "dosis",
+                  "width": "90px"
+                }
+              ],
+              "rows": 3,
+              "numbered": true,
+              "addButton": false,
+              "addLabel": "Tambah baris",
+              "span": 1
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlu_17",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlu_16",
+              "type": "paragraph",
+              "html": "Tulis keterangan di sini.",
+              "strong": false,
+              "center": false,
+              "span": 1
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlu_19",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlu_18",
+              "type": "subtitle",
+              "text": "Sub-judul",
+              "italic": false,
+              "span": 1
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlu_1b",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlu_1a",
+              "type": "list",
+              "marker": "decimal",
+              "items": [
+                {
+                  "segs": [
+                    {
+                      "type": "text",
+                      "text": "Poin pertama"
+                    }
+                  ]
+                },
+                {
+                  "segs": [
+                    {
+                      "type": "text",
+                      "text": "Poin kedua"
+                    }
+                  ]
+                }
+              ],
+              "span": 1
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlu_1d",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlu_1c",
+              "type": "note",
+              "html": "Perhatian: isi dengan huruf cetak.",
+              "plain": false,
+              "span": 1
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlu_1f",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlu_1e",
+              "type": "image",
+              "src": "logo.png",
+              "alt": "Gambar",
+              "height": "40mm",
+              "caption": "",
+              "center": true,
+              "span": 1
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlu_1h",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlu_1g",
+              "type": "divider",
+              "dashed": true,
+              "span": 1
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlu_1j",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlu_1i",
+              "type": "spacer",
+              "height": "10px",
+              "span": 1
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlu_1l",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlu_1k",
+              "type": "pagebreak",
+              "span": 1
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlu_1n",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlu_1m",
+              "type": "signature",
+              "role": "Petugas",
+              "place": "Bandung",
+              "withDate": true,
+              "withSelect": true,
+              "selectField": "dokter1",
+              "parafIndex": 116,
+              "withPentablet": true,
+              "span": 1
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlu_1p",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlu_1o",
+              "type": "button",
+              "label": "Hitung",
+              "elementId": "btnHitung",
+              "extraClass": "",
+              "span": 1
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlu_1r",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlu_1q",
+              "type": "html",
+              "html": "<!-- tempel HTML apa pun di sini -->",
+              "span": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s_lebar",
+      "title": "Uji Lebar & Tata Letak",
+      "page": 2,
+      "rows": [
+        {
+          "id": "r_mtb0fvlu_1v",
+          "cols": 2,
+          "widths": "30% 70%",
+          "cells": [
+            {
+              "id": "c_mtb0fvlu_1t",
+              "type": "text",
+              "label": "Lebar 60 persen",
+              "field": "lebar_persen",
+              "required": false,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "width": "60%",
+              "span": 1,
+              "placeholder": "",
+              "unit": "",
+              "boxed": false,
+              "readOnly": false,
+              "value": ""
+            },
+            {
+              "id": "c_mtb0fvlu_1u",
+              "type": "text",
+              "label": "Lebar 40mm",
+              "field": "lebar_mm",
+              "required": false,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "width": "40mm",
+              "span": 1,
+              "placeholder": "",
+              "unit": "",
+              "boxed": false,
+              "readOnly": false,
+              "value": ""
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlu_1w",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlu_1s",
+              "type": "date",
+              "label": "Tanggal Lahir",
+              "field": "tgl_lahir_kv",
+              "required": false,
+              "hint": "",
+              "layout": "samping",
+              "labelWidth": "35%",
+              "colon": true,
+              "width": "50%",
+              "span": 1,
+              "placeholder": "dd-mm-yy",
+              "withTime": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s_kolom",
+      "title": "Uji Kolom Fleksibel",
+      "page": 2,
+      "rows": [
+        {
+          "id": "r_mtb0fvlu_1x",
+          "cols": 6,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlu_1y",
+              "type": "text",
+              "label": "Kolom 1",
+              "field": "enam_1",
+              "required": false,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "width": "",
+              "span": 1,
+              "placeholder": "",
+              "unit": "",
+              "boxed": false,
+              "readOnly": false,
+              "value": ""
+            },
+            {
+              "id": "c_mtb0fvlu_1z",
+              "type": "text",
+              "label": "Kolom 2",
+              "field": "enam_2",
+              "required": false,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "width": "",
+              "span": 1,
+              "placeholder": "",
+              "unit": "",
+              "boxed": false,
+              "readOnly": false,
+              "value": ""
+            },
+            {
+              "id": "c_mtb0fvlu_20",
+              "type": "text",
+              "label": "Kolom 3",
+              "field": "enam_3",
+              "required": false,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "width": "",
+              "span": 1,
+              "placeholder": "",
+              "unit": "",
+              "boxed": false,
+              "readOnly": false,
+              "value": ""
+            },
+            {
+              "id": "c_mtb0fvlu_21",
+              "type": "text",
+              "label": "Kolom 4",
+              "field": "enam_4",
+              "required": false,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "width": "",
+              "span": 1,
+              "placeholder": "",
+              "unit": "",
+              "boxed": false,
+              "readOnly": false,
+              "value": ""
+            },
+            {
+              "id": "c_mtb0fvlu_22",
+              "type": "text",
+              "label": "Kolom 5",
+              "field": "enam_5",
+              "required": false,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "width": "",
+              "span": 1,
+              "placeholder": "",
+              "unit": "",
+              "boxed": false,
+              "readOnly": false,
+              "value": ""
+            },
+            {
+              "id": "c_mtb0fvlu_23",
+              "type": "text",
+              "label": "Kolom 6",
+              "field": "enam_6",
+              "required": false,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "width": "",
+              "span": 1,
+              "placeholder": "",
+              "unit": "",
+              "boxed": false,
+              "readOnly": false,
+              "value": ""
+            }
+          ]
+        },
+        {
+          "id": "r_mtb0fvlu_24",
+          "cols": 3,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlu_25",
+              "type": "textarea",
+              "label": "Melebar 2 kolom",
+              "field": "span_dua",
+              "required": false,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "width": "",
+              "span": 2,
+              "placeholder": "",
+              "rows": 3,
+              "ruled": false,
+              "boxed": false
+            },
+            {
+              "id": "c_mtb0fvlu_26",
+              "type": "text",
+              "label": "Sisa",
+              "field": "span_sisa",
+              "required": false,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "width": "",
+              "span": 1,
+              "placeholder": "",
+              "unit": "",
+              "boxed": false,
+              "readOnly": false,
+              "value": ""
+            },
+            null
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s_akhir",
+      "title": "Halaman Terakhir",
+      "page": 3,
+      "rows": [
+        {
+          "id": "r_mtb0fvlu_27",
+          "cols": 1,
+          "widths": "",
+          "cells": [
+            {
+              "id": "c_mtb0fvlu_28",
+              "type": "textarea",
+              "label": "Catatan Penutup",
+              "field": "catatan_penutup",
+              "required": false,
+              "hint": "",
+              "layout": "atas",
+              "labelWidth": "160px",
+              "colon": true,
+              "width": "",
+              "span": 1,
+              "placeholder": "",
+              "rows": 4,
+              "ruled": false,
+              "boxed": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

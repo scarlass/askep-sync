@@ -1,0 +1,1308 @@
+<style type="text/css">
+/* ==========================================================================
+   TEMA STANDAR FORMULIR MEDIS
+   ==========================================================================
+   Satu-satunya sumber ukuran, jarak, dan warna untuk seluruh formulir.
+   Disusun mengikuti panduan [A] sampai [G].
+
+   Cara pakai:
+     <div class="fm askep-page">  ... isi formulir ...  </div>
+
+   Kenapa semua selektor ditulis ".askep .askep-x" (dua kelas)?
+     Formulir ditanam ke dalam aplikasi yang sudah punya CSS global
+     (Bootstrap / SmartAdmin / smart-form). Selektor satu kelas kalah oleh
+     aturan seperti ".smart-form label { ... }". Dua kelas (0,2,0) menang.
+     Untuk aturan host yang memakai !important, lihat bagian [PENGUNCI]
+     di bagian paling bawah.
+   ========================================================================== */
+
+
+/* ==========================================================================
+   [G] TOKEN — ubah di sini, seluruh formulir ikut berubah
+   ========================================================================== */
+.askep {
+  /* --- [A] Tipografi ---------------------------------------------------- */
+  --askep-font           : Arial, Helvetica, sans-serif;
+  --askep-fs-hospital          : 13pt;    /* nama RS (kop)            12-14pt bold   */
+  --askep-fs-address      : 8.5pt;   /* alamat & kontak (kop)     8-9pt         */
+  --askep-fs-title       : 13.5pt;  /* judul formulir           13-14pt bold   */
+  --askep-fs-section     : 10.5pt;  /* judul section A, B, C    10-11pt bold   */
+  --askep-fs-label       : 9.5pt;   /* label field               9-10pt        */
+  --askep-fs-input       : 9.5pt;   /* isian / input teks        9-10pt        */
+  --askep-fs-hint      : 7.5pt;   /* keterangan / helper       7-8pt italic  */
+  --askep-fs-footer      : 8.5pt;   /* footer, ttd, tgl cetak    8-9pt         */
+  --askep-line-height             : 1.25;    /* line-height              1.15-1.3       */
+
+  /* --- [B] Jarak & grid -------------------------------------------------- */
+  --askep-margin-top    : 15mm;
+  --askep-margin-bottom   : 15mm;
+  --askep-margin-right   : 15mm;
+  --askep-margin-left    : 20mm;    /* ruang lubang binder                     */
+  --askep-page-width  : none;    /* isi 210mm bila ingin tampak seperti A4  */
+  --askep-gap-field      : 7px;     /* antar field dalam 1 section   6-8px     */
+  --askep-gap-label      : 6px;     /* label ke kotak isiannya       6-8px     */
+  --askep-gap-section    : 18px;    /* antar section                16-20px    */
+  --askep-gutter         : 7px;     /* antar kolom (2 kolom)         6-8px     */
+  --askep-gap-option       : 10px;    /* antar checkbox/radio         8-12px     */
+  --askep-gap-option-text  : 5px;     /* kotak checkbox ke teksnya               */
+  --askep-gap-header        : 12px;    /* antar blok di dalam kop                 */
+  --askep-header-right      : 62mm;    /* lebar sisi kanan kop (identitas pasien) */
+  --askep-logo-width        : 18mm;    /* lebar logo rumah sakit                  */
+  --askep-ident-width       : 100%;    /* lebar kotak identitas di dalam sisinya  */
+  --askep-ident-key         : minmax(0, 1fr); /* kolom label identitas            */
+  --askep-ident-value       : 30mm;    /* kolom nilai identitas                   */
+  --askep-ident-row         : 100%;    /* lebar isian pada baris berlebar khusus   */
+  --askep-ident-fs          : 9.5pt;   /* ukuran teks kotak identitas             */
+  --askep-gap-footer     : 15mm;    /* antar kolom tanda tangan                */
+  --askep-pad-y          : 5px;     /* padding isian atas/bawah      4-6px     */
+  --askep-pad-x          : 7px;     /* padding isian kiri/kanan      6-8px     */
+  --askep-input-height        : 8mm;     /* tinggi isian teks pendek                */
+  --askep-textarea-height     : 16mm;    /* tinggi minimal textarea     14-18mm     */
+  --askep-rule-spacing   : 4.2mm;   /* jarak garis textarea bergaris           */
+  --askep-box-size    : 3.5mm;   /* checkbox / radio              3-4mm     */
+  --askep-kv-width           : 200px;   /* lebar kolom label pada pola "Label :"   */
+
+  /* --- [E][F] Warna & garis ---------------------------------------------- */
+  --askep-color-text         : #202020; /* hitam pekat, aman difotokopi            */
+  --askep-color-navy         : #1F3864; /* judul section & kop                     */
+  --askep-color-accent        : #2E5395; /* garis di bawah judul section            */
+  --askep-color-required        : #C0392B; /* tanda bintang field wajib               */
+  --askep-color-border       : #999999; /* garis kotak isian                       */
+  --askep-color-border-dark   : #666666; /* garis checkbox / radio                  */
+  --askep-color-table-head   : #E8E8E8; /* latar header tabel data                 */
+  --askep-color-table-line   : #808080; /* garis sel tabel                         */
+  --askep-color-hint       : #4A4A4A; /* helper text                             */
+  --askep-color-header-bg       : #EEF2FA; /* latar kotak kop                         */
+  --askep-radius         : 3px;     /* radius sudut isian            2-4px     */
+  --askep-bw-input       : 1px;     /* tebal garis bawah isian                 */
+  --askep-bw-table       : 0.7px;   /* tebal garis sel tabel       0.5-1px     */
+  --askep-bw-accent       : 1.5px;   /* tebal garis judul section     1-1.5px   */
+
+  /* --- Basis -------------------------------------------------------------- */
+  font-family : var(--askep-font);
+  font-size   : var(--askep-fs-input);
+  line-height : var(--askep-line-height);
+  color       : var(--askep-color-text);
+}
+
+/* box-sizing juga pada elemen akar. Tanpa ini, aturan host
+   `* { box-sizing: content-box }` membuat padding halaman melebihi kontainer
+   sehingga kop terpotong di sisi kanan. */
+.askep,
+.askep *,
+.askep *::before,
+.askep *::after { box-sizing: border-box !important; }
+
+.askep p, .askep ul, .askep ol,
+.askep h1, .askep h2, .askep h3, .askep h4, .askep h5, .askep h6 { margin: 0; }
+.askep input, .askep select, .askep textarea { font-family: var(--askep-font); color: var(--askep-color-text); }
+.askep label { font-weight: 400; margin: 0; }
+
+/* <i></i> kosong bawaan smart-form disembunyikan; ikon Font Awesome (punya
+   class) pada mode cetak tetap tampil. */
+.askep .askep-check > i:not([class]),
+.askep .askep-radio > i:not([class]) { display: none !important; }
+
+
+/* ==========================================================================
+   [B] HALAMAN & MARGIN CETAK
+   ========================================================================== */
+.askep.askep-page {
+  width      : 100%;
+  max-width  : var(--askep-page-width);
+  margin     : 0;
+  padding    : var(--askep-margin-top) var(--askep-margin-right)
+               var(--askep-margin-bottom) var(--askep-margin-left);
+  background : #fff;
+}
+
+
+/* ==========================================================================
+   [D] BLOK 1 — HEADER (KOP)
+   ========================================================================== */
+/* Kop dibagi DUA SISI:
+     kiri  = logo + identitas rumah sakit + judul formulir
+     kanan = identitas ringkas pasien, rata kanan
+   Masing-masing sisi boleh diisi apa saja tanpa mengganggu sisi lainnya. */
+.askep .askep-header {
+  display        : flex !important;
+  align-items    : stretch;
+  gap            : var(--askep-gap-header);
+  padding        : 8px 10px;
+  border         : 1.5px solid var(--askep-color-navy);
+  background     : var(--askep-color-header-bg);
+  margin-bottom  : var(--askep-gap-section);
+  -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+}
+
+/* --- sisi kiri --- */
+.askep .askep-header-left {
+  display     : flex !important;
+  align-items : flex-start;
+  gap         : var(--askep-gap-header);
+  flex        : 1 1 auto;
+  min-width   : 0;
+}
+
+/* --- sisi kanan --- */
+.askep .askep-header-right {
+  flex      : 0 0 auto;
+  width     : var(--askep-header-right);
+  font-size : var(--askep-fs-label);
+  align-self: center;
+}
+
+/* Varian DUA SISI dengan lebar bebas.
+   Lebar tiap sisi dikirim lewat  style="--askep-header-cols: 1fr 62mm".
+   Dipakai grid (bukan flex) supaya satuan apa pun bisa dipakai: %, mm, fr. */
+.askep .askep-header--split {
+  display               : grid !important;
+  grid-template-columns : var(--askep-header-cols, 1fr auto) !important;
+  align-items           : center;
+  /* Jarak antar sisi dibuat NOL lalu diganti padding dalam. Kalau memakai gap,
+     lebar "50% 50%" akan meluber keluar kotak sebesar gap-nya. */
+  column-gap            : 0 !important;
+}
+.askep .askep-header--split > .askep-header-right { padding-left: var(--askep-gap-header); }
+.askep .askep-header--split > .askep-header-left,
+.askep .askep-header--split > .askep-header-right {
+  width     : auto;
+  flex      : initial;
+  min-width : 0;
+}
+
+/* Varian SATU KOLOM: seluruh isi kop menumpuk selebar halaman */
+.askep .askep-header--stack {
+  display        : block !important;
+}
+.askep .askep-header--stack > .askep-header-left { display: flex !important; }
+.askep .askep-header--stack > .askep-header-right {
+  width      : 100%;
+  margin-top : var(--askep-gap-header);
+}
+
+/* Perataan isi tiap sisi */
+.askep .askep-side--center { text-align: center; }
+.askep .askep-side--right  { text-align: right; }
+.askep .askep-header-left.askep-side--center { justify-content: center; }
+.askep .askep-header-left.askep-side--right  { justify-content: flex-end; }
+.askep .askep-header-ident.askep-side--left   { text-align: left; }
+.askep .askep-header-ident.askep-side--center { text-align: center; }
+
+/* Varian: beri garis pemisah tipis antara kedua sisi */
+.askep .askep-header--divided .askep-header-right {
+  border-left  : 1px solid var(--askep-color-accent);
+  padding-left : var(--askep-gap-header);
+}
+.askep .askep-header-logo     { flex: 0 0 auto; align-self: center; }
+.askep .askep-header-logo img { width: var(--askep-logo-width); height: auto; object-fit: contain; display: block; }
+.askep .askep-header-logo--box {
+  display        : flex !important;
+  width          : 18mm;
+  height         : 14mm;
+  align-items    : center;
+  justify-content: center;
+  border         : 1px solid var(--askep-color-border);
+  background     : #E4E4E4;
+  text-align     : center;
+  font-size      : var(--askep-fs-hint);
+  color          : #6A6A6A;
+}
+
+.askep .askep-header-hospital    { flex: 1 1 auto; min-width: 0; }
+.askep .askep-header-name  {
+  font-size      : var(--askep-fs-hospital);
+  font-weight    : bold;
+  text-transform : uppercase;
+  color          : var(--askep-color-navy);
+  line-height    : 1.2;
+}
+.askep .askep-header-address {
+  font-size   : var(--askep-fs-address);
+  line-height : var(--askep-line-height);
+  color       : var(--askep-color-hint);
+  margin-top  : 2px;
+}
+.askep .askep-header-title {
+  font-size      : var(--askep-fs-title);
+  font-weight    : bold;
+  text-transform : uppercase;
+  color          : var(--askep-color-navy);
+  line-height    : 1.2;
+  margin-top     : 8px;
+}
+
+/* Identitas ringkas pasien.
+   Ukurannya diatur lewat custom property pada elemennya sendiri:
+     style="--askep-ident-width: 80%; --askep-ident-value: 34mm"
+   sehingga kotak ini bisa lebih kecil daripada sisi yang menampungnya. */
+.askep .askep-header-ident {
+  display               : grid !important;
+  width                 : var(--askep-ident-width);
+  grid-template-columns : var(--askep-ident-key) var(--askep-ident-value);
+  column-gap            : var(--askep-gutter);
+  row-gap               : var(--askep-gap-field);
+  align-items           : end;
+  font-size             : var(--askep-ident-fs);
+}
+/* posisi kotak di dalam sisinya */
+.askep .askep-header-ident--left   { margin-right: auto; margin-left: 0; }
+.askep .askep-header-ident--center { margin-left: auto; margin-right: auto; }
+.askep .askep-header-ident--right  { margin-left: auto; margin-right: 0; }
+.askep .askep-header-ident-key {
+  text-align    : right;
+  min-width     : 0;
+  /* Label panjang MEMBUNGKUS, bukan melebarkan kotak. Dengan nowrap, label
+     seperti "Tanda tangan penerima" memaksa kolomnya melar dan seluruh kotak
+     identitas meluber keluar kop. */
+  white-space   : normal;
+  overflow-wrap : anywhere;
+}
+.askep .askep-header-ident-value {
+  min-width    : 0;
+  min-height   : 1.3em;
+  font-weight  : bold;
+  white-space  : normal;
+  border-bottom: 1px dotted var(--askep-color-border-dark);
+}
+/* Baris identitas dengan lebar isian KHUSUS.
+   Baris ini keluar dari pembagian dua kolom dan memakai flex, sehingga
+   lebarnya dihitung terhadap KOTAK IDENTITAS — bukan terhadap kolom nilai.
+   Kalau lebarnya melebihi kotak, isian dibatasi 100% dan labelnya turun
+   ke barisnya sendiri (bukan meluber keluar kop). */
+.askep .askep-header-ident-row {
+  grid-column     : 1 / -1;
+  display         : flex !important;
+  flex-wrap       : wrap;
+  align-items     : end;
+  justify-content : flex-end;
+  column-gap      : var(--askep-gutter);
+  row-gap         : 2px;
+}
+.askep .askep-header-ident-row > .askep-header-ident-key {
+  flex      : 1 1 auto;
+  min-width : 0;
+}
+.askep .askep-header-ident-row > .askep-header-ident-value {
+  flex      : 0 0 var(--askep-ident-row);
+  width     : var(--askep-ident-row);
+  max-width : 100%;
+}
+
+/* label yang memakai lebar penuh (isian di bawahnya) */
+.askep .askep-header-ident-key--full {
+  grid-column : 1 / -1;
+  text-align  : left;
+  margin-bottom: -2px;
+}
+
+/* baris identitas berisi pilihan memakai lebar penuh */
+.askep .askep-header-ident-full {
+  grid-column    : 1 / -1;
+  border-bottom  : 0;
+  display        : flex;
+  flex-wrap      : wrap;
+  justify-content: flex-end;
+  gap            : 4px var(--askep-gap-option);
+  font-weight    : 400;
+}
+
+
+/* ==========================================================================
+   [D] BLOK 2 — BODY & SECTION
+   ========================================================================== */
+.askep .askep-section         { margin-bottom: var(--askep-gap-section); }
+/* [D] BLOK 2 — badan formulir; section terakhir tak perlu jarak bawah lagi */
+.askep .askep-body > .askep-section:last-child { margin-bottom: 0; }
+.askep .askep-section:last-child { margin-bottom: 0; }
+
+.askep .askep-section-title {
+  font-size      : var(--askep-fs-section);
+  font-weight    : bold;
+  color          : var(--askep-color-navy);
+  text-transform : uppercase;
+  letter-spacing : .2px;
+  padding-bottom : 3px;
+  margin         : 0 0 8px;
+  border-bottom  : var(--askep-bw-accent) solid var(--askep-color-accent);
+}
+.askep .askep-section-content > * + * { margin-top: var(--askep-gap-field); }
+
+.askep .askep-subtitle          { font-size: var(--askep-fs-label); font-weight: bold; margin: 0 0 4px; }
+.askep .askep-subtitle--italic  { font-style: italic; }
+
+.askep .askep-indent    { margin-left: 10px; }
+.askep .askep-indent-lg { margin-left: 22px; }
+
+
+/* ==========================================================================
+   [C] ATURAN KOLOM
+   ========================================================================== */
+.askep .askep-grid {
+  display               : grid !important;
+  grid-template-columns : var(--askep-cols, repeat(2, minmax(0, 1fr))) !important;
+  column-gap            : var(--askep-gutter);
+  row-gap               : var(--askep-gap-field);
+}
+.askep .askep-grid--1 { --askep-cols: minmax(0, 1fr); }
+.askep .askep-grid--3 { --askep-cols: repeat(3, minmax(0, 1fr)); }
+.askep .askep-grid--4 { --askep-cols: repeat(4, minmax(0, 1fr)); }
+.askep .askep-grid--5 { --askep-cols: repeat(5, minmax(0, 1fr)); }
+.askep .askep-grid--6 { --askep-cols: repeat(6, minmax(0, 1fr)); }
+.askep .askep-col-full { grid-column: 1 / -1; }
+
+/* satu sel boleh melebar beberapa kolom */
+.askep .askep-span-2 { grid-column: span 2; }
+.askep .askep-span-3 { grid-column: span 3; }
+.askep .askep-span-4 { grid-column: span 4; }
+.askep .askep-span-5 { grid-column: span 5; }
+.askep .askep-span-6 { grid-column: span 6; }
+
+/* pola "Label : isian" dengan titik dua sejajar.
+   Atur lebar kolom label lewat  style="--askep-kv-width: 230px" */
+.askep .askep-kv {
+  display               : grid !important;
+  grid-template-columns : var(--askep-kv-width) minmax(0, 1fr);
+  column-gap            : var(--askep-gutter);
+  row-gap               : var(--askep-gap-field);
+  align-items           : start;
+}
+.askep .askep-kv-key {
+  position      : relative;
+  padding-right : 10px;
+  font-size     : var(--askep-fs-label);
+  line-height   : var(--askep-line-height);
+}
+.askep .askep-kv-key::after     { content: ":"; position: absolute; right: 2px; top: 0; }
+.askep .askep-kv-key--plain::after { content: none; }
+.askep .askep-kv-value            { font-size: var(--askep-fs-input); line-height: var(--askep-line-height); min-width: 0; }
+.askep .askep-kv-value--strong      { font-weight: bold; }
+
+/* pola "Label : isian" untuk komponen apa pun (tanggal, dropdown, angka, ...).
+   Dipakai bila komponen diatur bertata letak SAMPING. Lebar kolom label
+   diatur lewat  style="--askep-kv-width: 160px"  atau satuan lain (%, mm). */
+.askep .askep-field--inline {
+  display               : grid !important;
+  grid-template-columns : var(--askep-kv-width) minmax(0, 1fr);
+  column-gap            : var(--askep-gutter);
+  row-gap               : 2px;
+  align-items           : baseline;
+}
+.askep .askep-field--inline > .askep-label {
+  position      : relative;
+  margin        : 0;
+  padding-right : 10px;
+}
+.askep .askep-field--inline > .askep-label.askep-label--colon::after {
+  content  : ":";
+  position : absolute;
+  right    : 2px;
+  top      : 0;
+}
+.askep .askep-field--inline > .askep-hint { grid-column: 2; }
+
+/* field yang ditumpuk di luar .askep-grid tetap berjarak 6-8px */
+.askep :not(.askep-grid) > .askep-field + .askep-field { margin-top: var(--askep-gap-field); }
+
+
+/* ==========================================================================
+   LABEL & TEKS
+   ========================================================================== */
+.askep .askep-field { display: block; }
+.askep .askep-label {
+  display     : block;
+  font-size   : var(--askep-fs-label);
+  line-height : var(--askep-line-height);
+  margin      : 0 0 var(--askep-gap-label);
+}
+.askep .askep-label--inline { display: inline; margin: 0; }
+.askep .askep-required   { color: var(--askep-color-required); font-weight: bold; }   /* [F] */
+.askep .askep-hint {
+  font-size   : var(--askep-fs-hint);
+  font-style  : italic;
+  color       : var(--askep-color-hint);
+  line-height : var(--askep-line-height);
+}
+
+
+/* ==========================================================================
+   [E] KOMPONEN ISIAN
+   --------------------------------------------------------------------------
+   Gaya baku: GARIS BAWAH saja. Untuk kotak penuh sesuai [E], tambahkan
+   kelas --kotak pada elemennya (mis. class="askep-input askep-input--boxed").
+   ========================================================================== */
+.askep .askep-input {
+  display       : block;
+  width         : 100%;
+  height        : var(--askep-input-height);
+  padding       : var(--askep-pad-y) 2px 1px;
+  font-size     : var(--askep-fs-input);
+  line-height   : var(--askep-line-height);
+  color         : var(--askep-color-text);
+  background    : transparent;
+  border        : 0;
+  border-bottom : var(--askep-bw-input) solid var(--askep-color-border);
+  border-radius : 0;
+  outline       : none;
+}
+.askep .askep-textarea {
+  display       : block;
+  width         : 100%;
+  min-height    : var(--askep-textarea-height);
+  padding       : 0 2px;
+  font-size     : var(--askep-fs-input);
+  line-height   : var(--askep-line-height);
+  color         : var(--askep-color-text);
+  background    : transparent;
+  border        : 0;
+  border-bottom : var(--askep-bw-input) solid var(--askep-color-border);
+  border-radius : 0;
+  outline       : none;
+  resize        : vertical;
+}
+.askep .askep-select {
+  display       : block;
+  width         : 100%;
+  height        : var(--askep-input-height);
+  padding       : 3px 2px 1px;
+  font-size     : var(--askep-fs-input);
+  color         : var(--askep-color-text);
+  background    : transparent;
+  border        : 0;
+  border-bottom : var(--askep-bw-input) solid var(--askep-color-border);
+  border-radius : 0;
+  outline       : none;
+}
+/* nilai read-only yang tampil setara field */
+.askep .askep-value {
+  display       : block;
+  width         : 100%;
+  min-height    : var(--askep-input-height);
+  padding       : var(--askep-pad-y) 2px 1px;
+  font-size     : var(--askep-fs-input);
+  line-height   : var(--askep-line-height);
+  color         : var(--askep-color-text);
+  background    : transparent;
+  border        : 0;
+  border-bottom : var(--askep-bw-input) solid var(--askep-color-border);
+}
+.askep .askep-value--strong { font-weight: bold; }
+
+.askep .askep-textarea::placeholder,
+.askep .askep-input::placeholder {
+  font-style : italic;
+  color      : #7A7A7A;
+  font-size  : var(--askep-fs-hint);
+}
+
+/* --- varian SEBARIS: isian berdampingan dengan satuan / teks lain --------- */
+.askep .askep-input--inline {
+  width    : auto;
+  flex     : 1 1 auto;
+  min-width: 60px;
+}
+
+/* --- varian KOTAK penuh sesuai [E] --------------------------------------- */
+.askep .askep-input--boxed,
+.askep .askep-textarea--boxed,
+.askep .askep-select--boxed,
+.askep .askep-value--boxed {
+  padding       : var(--askep-pad-y) var(--askep-pad-x);
+  background    : #fff;
+  border        : 1px solid var(--askep-color-border);
+  border-radius : var(--askep-radius);
+}
+
+/* --- varian textarea BERGARIS (untuk dicetak lalu ditulis tangan) -------- */
+.askep .askep-textarea--ruled {
+  padding          : 0 2px;
+  border-bottom    : 0;
+  line-height      : var(--askep-rule-spacing);
+  background-image : linear-gradient(to bottom,
+                       transparent calc(var(--askep-rule-spacing) - 1px),
+                       var(--askep-color-border) calc(var(--askep-rule-spacing) - 1px));
+  background-size  : 100% var(--askep-rule-spacing);
+  background-repeat: repeat-y;
+  background-attachment: local;
+}
+
+/* --- isian garis yang menyatu di tengah kalimat -------------------------- */
+.askep .askep-line {
+  display       : inline-block;
+  width         : 120px;
+  padding       : 1px 4px;
+  font-size     : var(--askep-fs-input);
+  line-height   : var(--askep-line-height);
+  color         : var(--askep-color-text);
+  background    : transparent;
+  border        : 0;
+  border-bottom : var(--askep-bw-input) solid var(--askep-color-border);
+  border-radius : 0;
+  outline       : none;
+  vertical-align: baseline;
+}
+.askep .askep-line--center { text-align: center; }
+
+.askep .askep-w-40  { width: 40px;  }
+.askep .askep-w-50  { width: 50px;  }
+.askep .askep-w-60  { width: 60px;  }
+.askep .askep-w-80  { width: 80px;  }
+.askep .askep-w-100 { width: 100px; }
+.askep .askep-w-120 { width: 120px; }
+.askep .askep-w-150 { width: 150px; }
+.askep .askep-w-180 { width: 180px; }
+.askep .askep-w-200 { width: 200px; }
+.askep .askep-w-250 { width: 250px; }
+.askep .askep-w-full{ width: 100%;  }
+
+
+/* ==========================================================================
+   [E] CHECKBOX & RADIO
+   Digambar sendiri (appearance:none) supaya ukurannya pasti 3-4mm dan tetap
+   tercetak jelas hitam-putih.
+   ========================================================================== */
+.askep .askep-check,
+.askep .askep-radio {
+  display     : inline-flex !important;
+  align-items : center;
+  gap         : var(--askep-gap-option-text);
+  margin      : 0;
+  font-size   : var(--askep-fs-label);
+  line-height : var(--askep-line-height);
+  color       : var(--askep-color-text);
+  cursor      : pointer;
+}
+.askep .askep-check > input[type="checkbox"],
+.askep .askep-radio > input[type="radio"] {
+  -webkit-appearance : none;
+          appearance : none;
+  flex        : 0 0 auto;
+  width       : var(--askep-box-size);
+  height      : var(--askep-box-size);
+  margin      : 0;
+  padding     : 0;
+  position    : relative;
+  background  : #fff;
+  border      : 0.7px solid var(--askep-color-border-dark);
+  border-radius: 1px;
+  outline     : none;
+  cursor      : pointer;
+  -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+}
+.askep .askep-radio > input[type="radio"] { border-radius: 50%; }
+.askep .askep-check > input[type="checkbox"]:checked::after {
+  content   : "";
+  position  : absolute;
+  left      : 32%;
+  top       : 6%;
+  width     : 30%;
+  height    : 62%;
+  border    : solid var(--askep-color-text);
+  border-width: 0 1.6px 1.6px 0;
+  transform : rotate(45deg);
+}
+.askep .askep-radio > input[type="radio"]:checked::after {
+  content      : "";
+  position     : absolute;
+  inset        : 18%;
+  border-radius: 50%;
+  background   : var(--askep-color-text);
+}
+
+.askep .askep-options {
+  display    : flex !important;
+  flex-wrap  : wrap;
+  align-items: center;
+  gap        : 4px var(--askep-gap-option);
+}
+.askep .askep-options--baseline { align-items: baseline; }
+.askep .askep-options--column { flex-direction: column; align-items: flex-start; gap: var(--askep-gap-field); }
+.askep .askep-options--grid2,
+.askep .askep-options--grid3,
+.askep .askep-options--grid4,
+.askep .askep-options--grid5 {
+  display    : grid !important;
+  column-gap : var(--askep-gap-option);
+  row-gap    : var(--askep-gap-field);
+  align-items: center;
+}
+.askep .askep-options--grid2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+.askep .askep-options--grid3 { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+.askep .askep-options--grid4 { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+.askep .askep-options--grid5 { grid-template-columns: repeat(5, minmax(0, 1fr)) !important; }
+.askep .askep-options-wide  { grid-column: 1 / -1; }
+
+
+/* ==========================================================================
+   KOMPONEN TAMBAHAN
+   ========================================================================== */
+
+/* --- deret kotak satu karakter (No. RM, NIK, nomor telepon) -------------- */
+.askep .askep-boxes {
+  display   : flex !important;
+  flex-wrap : wrap;
+  gap       : 3px;
+}
+.askep .askep-box {
+  width         : 7mm;
+  height        : var(--askep-input-height);
+  padding       : 0;
+  text-align    : center;
+  font-family   : var(--askep-font);
+  font-size     : var(--askep-fs-input);
+  color         : var(--askep-color-text);
+  background    : #fff;
+  border        : 1px solid var(--askep-color-border);
+  border-radius : 2px;
+  outline       : none;
+}
+
+/* --- skala angka (skala nyeri 0-10, skala risiko) ------------------------ */
+.askep .askep-scale {
+  display     : flex !important;
+  flex-wrap   : wrap;
+  align-items : flex-end;
+  gap         : 4px var(--askep-gap-option);
+}
+.askep .askep-scale-item {
+  display        : flex !important;
+  flex-direction : column;
+  align-items    : center;
+  gap            : 2px;
+  font-size      : var(--askep-fs-label);
+  line-height    : 1.1;
+}
+.askep .askep-scale-end {
+  font-size  : var(--askep-fs-hint);
+  font-style : italic;
+  color      : var(--askep-color-hint);
+}
+
+/* --- kotak skor / total -------------------------------------------------- */
+.askep .askep-score {
+  display     : flex !important;
+  flex-wrap   : wrap;
+  align-items : baseline;
+  gap         : 8px;
+}
+.askep .askep-score-note {
+  font-size  : var(--askep-fs-hint);
+  font-style : italic;
+  color      : var(--askep-color-hint);
+}
+
+/* --- kotak catatan / peringatan ------------------------------------------ */
+.askep .askep-note {
+  padding     : 6px 8px;
+  font-size   : var(--askep-fs-input);
+  line-height : var(--askep-line-height);
+  border      : var(--askep-bw-table) solid var(--askep-color-border);
+  border-left : 3px solid var(--askep-color-accent);
+  background  : #F6F8FC;
+  -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+}
+.askep .askep-note--plain { background: transparent; border-left-width: var(--askep-bw-table); }
+
+/* --- gambar (denah tubuh, diagram, skala wajah) -------------------------- */
+.askep .askep-figure        { margin: 0; }
+.askep .askep-figure img    { max-width: 100%; }
+.askep .askep-figure--center{ text-align: center; }
+.askep .askep-figure-caption {
+  margin-top : 3px;
+  font-size  : var(--askep-fs-hint);
+  font-style : italic;
+  color      : var(--askep-color-hint);
+}
+
+/* --- jarak kosong & pemisah halaman cetak -------------------------------- */
+.askep .askep-spacer { height: 10px; }
+.askep .askep-pagebreak {
+  height     : 0;
+  border-top : 1px dashed var(--askep-color-accent);
+  margin     : 8px 0;
+}
+@media print {
+  .askep .askep-pagebreak {
+    border     : 0;
+    margin     : 0;
+    break-before      : page;
+    page-break-before : always;
+  }
+}
+
+
+/* ==========================================================================
+   [C][E] TABEL
+   ========================================================================== */
+.askep .askep-table {
+  display        : table !important;
+  width          : 100%;
+  border-collapse: collapse;
+  font-size      : var(--askep-fs-input);
+  line-height    : var(--askep-line-height);
+}
+.askep .askep-table th,
+.askep .askep-table td {
+  border        : var(--askep-bw-table) solid var(--askep-color-table-line);
+  padding       : 4px 6px;
+  vertical-align: top;
+}
+.askep .askep-table thead th {
+  background  : var(--askep-color-table-head);
+  font-weight : bold;
+  text-align  : center;
+  font-size   : var(--askep-fs-label);
+  -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+}
+.askep .askep-table td.askep-center,
+.askep .askep-table th.askep-center { text-align: center; }
+.askep .askep-table .askep-line    { padding: 1px 2px; }
+
+/* Pembungkus tabel: di layar sempit tabel bisa digeser mendatar,
+   saat dicetak pembungkus ini tidak berpengaruh sama sekali. */
+.askep .askep-table-wrap { width: 100%; }
+
+/* Tabel tata letak (tanpa garis). Pakai kombinator anak — dengan selektor
+   keturunan, aturan ini ikut mematikan border tabel DATA yang bersarang. */
+.askep .askep-table-plain { width: 100%; border-collapse: collapse; }
+.askep .askep-table-plain > thead > tr > th,
+.askep .askep-table-plain > tbody > tr > td,
+.askep .askep-table-plain > tbody > tr > th,
+.askep .askep-table-plain > tr > td,
+.askep .askep-table-plain > tr > th { border: 0; padding: 0; }
+
+
+/* ==========================================================================
+   DAFTAR POIN
+   ========================================================================== */
+.askep .askep-list {
+  margin      : 4px 0 0;
+  padding-left: 16px;
+  list-style  : disc;
+  font-size   : var(--askep-fs-input);
+  line-height : var(--askep-line-height);
+}
+.askep .askep-list--circle { list-style: circle; }
+.askep .askep-list--decimal { list-style: decimal; }
+.askep .askep-list--alpha   { list-style: lower-alpha; }
+.askep .askep-list--none    { list-style: none; padding-left: 0; }
+.askep .askep-list > li + li  { margin-top: 4px; }
+
+
+/* ==========================================================================
+   HALAMAN BERTINGKAT (PAGING)
+   --------------------------------------------------------------------------
+   Mengikuti pola aplikasi: tiap halaman adalah <fieldset id="dokumen_page_N">,
+   halaman yang tidak aktif diberi kelas .hidden, dan navigasinya memakai
+   <ul class="pagination">. Kelas .hidden ikut didefinisikan di sini supaya
+   pratinjau di luar aplikasi (yang tidak memuat Bootstrap) tetap benar.
+   ========================================================================== */
+.askep .hidden { display: none !important; }
+.askep .askep-page-part {
+  margin  : 0;
+  padding : 0;
+  border  : 0;
+  min-width: 0;
+}
+.askep .askep-pagination {
+  display        : flex !important;
+  flex-wrap      : wrap;
+  justify-content: flex-end;
+  gap            : 4px;
+  margin         : 0 0 10px;
+  padding        : 0;
+  list-style     : none;
+  font-size      : var(--askep-fs-label);
+}
+.askep .askep-pagination--bottom { margin: 12px 0 0; }
+.askep .askep-pagination > li { display: inline-block; }
+.askep .askep-pagination > li > a {
+  display        : inline-block;
+  padding        : 2px 9px;
+  color          : var(--askep-color-navy);
+  background     : #fff;
+  border         : 1px solid var(--askep-color-border);
+  border-radius  : var(--askep-radius);
+  text-decoration: none;
+  cursor         : pointer;
+}
+.askep .askep-pagination > li.active > a {
+  color      : #fff;
+  background : var(--askep-color-navy);
+  border-color: var(--askep-color-navy);
+}
+.askep .askep-pagination > li.askep-pagination-label > a {
+  border     : 0;
+  background : transparent;
+  color      : var(--askep-color-hint);
+  cursor     : default;
+}
+
+
+/* ==========================================================================
+   [D] BLOK 3 — FOOTER
+   ========================================================================== */
+.askep .askep-footer {
+  margin-top  : var(--askep-gap-section);
+  padding-top : 10px;
+  border-top  : 1px dashed var(--askep-color-border);
+  font-size   : var(--askep-fs-footer);
+  line-height : var(--askep-line-height);
+}
+.askep .askep-footer-row {
+  display        : flex !important;
+  justify-content: flex-end;
+  align-items    : flex-start;
+  gap            : var(--askep-gap-footer);
+  flex-wrap      : wrap;
+}
+.askep .askep-sign        { min-width: 60mm; text-align: center; }
+.askep .askep-sign-place { margin-bottom: 6px; }
+.askep .askep-sign-role  { font-weight: bold; margin-bottom: 4px; }
+.askep .askep-sign-area   {
+  display        : flex !important;
+  min-height     : 22mm;
+  align-items    : center;
+  justify-content: center;
+}
+.askep .askep-sign-area img { max-width: 45mm; max-height: 22mm; object-fit: contain; }
+.askep .askep-sign-name   { margin-top: 2px; }
+.askep .askep-sign-note    {
+  font-size : var(--askep-fs-hint);
+  font-style: italic;
+  color     : var(--askep-color-hint);
+  margin-top: 2px;
+}
+.askep .askep-footer-print {
+  margin-top: 6px;
+  text-align: right;
+  font-size : var(--askep-fs-hint);
+  color     : var(--askep-color-hint);
+}
+
+
+/* Footer DUA SISI: mis. catatan di kiri, tanda tangan di kanan.
+   Lebar tiap sisi lewat  style="--askep-footer-cols: 1fr 1fr". */
+.askep .askep-footer--split {
+  display               : grid !important;
+  grid-template-columns : var(--askep-footer-cols, 1fr 1fr) !important;
+  column-gap            : 0;          /* lihat catatan pada kop dua sisi */
+  align-items           : start;
+}
+.askep .askep-footer-side + .askep-footer-side { padding-left: var(--askep-gutter); }
+.askep .askep-footer-side { min-width: 0; }
+.askep .askep-footer-side > .askep-footer-row { gap: var(--askep-gutter); }
+.askep .askep-footer-note { font-size: var(--askep-fs-footer); line-height: var(--askep-line-height); }
+
+
+/* ==========================================================================
+   TOMBOL BANTU (layar saja)
+   ========================================================================== */
+.askep .askep-btn {
+  display        : inline-flex;
+  align-items    : center;
+  gap            : 5px;
+  padding        : 3px 9px;
+  font-size      : var(--askep-fs-hint);
+  color          : var(--askep-color-text);
+  background     : #f5f5f5;
+  border         : 1px solid var(--askep-color-border);
+  border-radius  : var(--askep-radius);
+  cursor         : pointer;
+  text-decoration: none;
+}
+.askep .askep-btn:hover { background: #ececec; color: var(--askep-color-text); text-decoration: none; }
+
+
+/* ==========================================================================
+   UTILITAS
+   ========================================================================== */
+.askep .askep-right   { text-align: right; }
+.askep .askep-center  { text-align: center; }
+.askep .askep-bold   { font-weight: bold; }
+.askep .askep-nowrap  { white-space: nowrap; }
+.askep .askep-gap    { margin-top: var(--askep-gap-field); }
+.askep .askep-gap-lg { margin-top: var(--askep-gap-section); }
+.askep-print-only { display: none; }
+
+
+/* ==========================================================================
+   [B][G] CETAK
+   ========================================================================== */
+@page {
+  size   : A4 portrait;        /* F4/Folio: ganti menjadi 215mm 330mm */
+  margin : 15mm 15mm 15mm 20mm;
+}
+
+@media print {
+  .askep               { color: #000; }
+  .askep.askep-page       { max-width: none; padding: 0; margin: 0; }
+  .askep-no-print,
+  .askep .askep-pagination,
+  .pagination,
+  .hide-print       { display: none !important; }
+
+  /* Cetak SEMUA halaman (bukan hanya yang sedang tampil): tambahkan kelas
+     askep-print-all pada pembungkus formulir. */
+  .askep-print-all .askep-page-part.hidden { display: block !important; }
+  .askep-print-all .askep-page-part + .askep-page-part {
+    break-before      : page;
+    page-break-before : always;
+  }
+  .askep-print-only   { display: block; }
+
+  .askep .askep-header           { break-inside: avoid; page-break-inside: avoid; }
+  .askep .askep-section       { break-inside: auto;  page-break-inside: auto;  }
+  .askep .askep-section-title { break-after: avoid;  page-break-after: avoid;  }
+  .askep .askep-table tr      { break-inside: avoid; page-break-inside: avoid; }
+  .askep .askep-footer        { break-inside: avoid; page-break-inside: avoid; }
+
+  .askep .askep-table thead th {
+    background: var(--askep-color-table-head) !important;
+    -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+  }
+}
+
+
+/* ==========================================================================
+   LAYAR SEMPIT (RESPONSIF)
+   --------------------------------------------------------------------------
+   Hanya berlaku di LAYAR. Tata letak cetak sama sekali tidak tersentuh: di
+   kertas jumlah kolom tetap seperti yang dirancang.
+
+   Ambang 700px dipilih dengan sengaja: A4 selebar 794px dan F4 selebar 813px
+   (pada 96dpi), jadi pratinjau seukuran kertas TIDAK ikut diruntuhkan.
+   ========================================================================== */
+@media screen and (max-width: 700px) {
+  .askep.askep-page { padding: 12px 14px; }
+
+  .askep .askep-grid,
+  .askep .askep-grid--3,
+  .askep .askep-grid--4,
+  .askep .askep-grid--5,
+  .askep .askep-grid--6 { grid-template-columns: minmax(0, 1fr) !important; }
+
+  .askep .askep-span-2,
+  .askep .askep-span-3,
+  .askep .askep-span-4,
+  .askep .askep-span-5,
+  .askep .askep-span-6 { grid-column: auto; }
+
+  .askep .askep-field--inline,
+  .askep .askep-kv { grid-template-columns: minmax(0, 1fr) !important; row-gap: 2px; }
+  .askep .askep-field--inline > .askep-label,
+  .askep .askep-kv-key { padding-right: 0; }
+  .askep .askep-field--inline > .askep-label.askep-label--colon::after,
+  .askep .askep-kv-key::after { position: static; }
+  .askep .askep-field--inline > .askep-hint { grid-column: 1; }
+
+  .askep .askep-header { flex-direction: column !important; }
+  .askep .askep-header-right {
+    width        : 100% !important;
+    border-left  : 0;
+    border-top   : 1px solid var(--askep-color-accent);
+    padding-left : 0;
+    padding-top  : 8px;
+  }
+
+  .askep .askep-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .askep .askep-table-wrap > .askep-table { min-width: 520px; }
+
+  .askep .askep-header--split,
+  .askep .askep-footer--split { grid-template-columns: minmax(0, 1fr) !important; row-gap: 8px; }
+  .askep .askep-header--split > .askep-header-right { margin-top: 8px; }
+  .askep .askep-header-ident { width: 100% !important; margin-left: 0; }
+
+  .askep .askep-footer-row { justify-content: flex-start !important; gap: 10mm; }
+  .askep .askep-sign { min-width: 0; width: 100%; }
+}
+
+@media screen and (max-width: 480px) {
+  .askep .askep-options--grid2,
+  .askep .askep-options--grid3,
+  .askep .askep-options--grid4,
+  .askep .askep-options--grid5 { grid-template-columns: minmax(0, 1fr) !important; }
+  .askep .askep-scale { gap: 4px 6px; }
+}
+
+
+/* ==========================================================================
+   [PENGUNCI] Spesifisitas tinggi
+   --------------------------------------------------------------------------
+   Aplikasi host kerap memakai aturan seperti
+       .smart-form input[type=text] { border: ... !important; height: 32px }
+   yang spesifisitasnya (0,2,1) MENGALAHKAN ".askep .askep-input" (0,2,0).
+   Blok ini mengulang properti visual inti dengan kelas ganda (0,3,0) supaya
+   tampilan formulir tetap konsisten. Nilainya tetap dari token yang sama.
+   ========================================================================== */
+.askep .askep-input.askep-input {
+  width         : 100% !important;
+  height        : var(--askep-input-height) !important;
+  min-height    : var(--askep-input-height) !important;
+  padding       : var(--askep-pad-y) 2px 1px !important;
+  font-family   : var(--askep-font) !important;
+  font-size     : var(--askep-fs-input) !important;
+  line-height   : var(--askep-line-height) !important;
+  color         : var(--askep-color-text) !important;
+  background    : transparent !important;
+  border        : 0 !important;
+  border-bottom : var(--askep-bw-input) solid var(--askep-color-border) !important;
+  border-radius : 0 !important;
+  box-shadow    : none !important;
+}
+.askep .askep-textarea.askep-textarea {
+  width         : 100% !important;
+  min-height    : var(--askep-textarea-height) !important;
+  height        : auto !important;
+  padding       : 0 2px !important;
+  font-family   : var(--askep-font) !important;
+  font-size     : var(--askep-fs-input) !important;
+  line-height   : var(--askep-line-height) !important;
+  color         : var(--askep-color-text) !important;
+  background    : transparent !important;
+  border        : 0 !important;
+  border-bottom : var(--askep-bw-input) solid var(--askep-color-border) !important;
+  border-radius : 0 !important;
+  box-shadow    : none !important;
+}
+.askep .askep-select.askep-select {
+  width         : 100% !important;
+  height        : var(--askep-input-height) !important;
+  padding       : 3px 2px 1px !important;
+  font-family   : var(--askep-font) !important;
+  font-size     : var(--askep-fs-input) !important;
+  color         : var(--askep-color-text) !important;
+  background    : transparent !important;
+  border        : 0 !important;
+  border-bottom : var(--askep-bw-input) solid var(--askep-color-border) !important;
+  border-radius : 0 !important;
+  box-shadow    : none !important;
+}
+.askep .askep-value.askep-value {
+  min-height    : var(--askep-input-height) !important;
+  padding       : var(--askep-pad-y) 2px 1px !important;
+  font-size     : var(--askep-fs-input) !important;
+  background    : transparent !important;
+  border        : 0 !important;
+  border-bottom : var(--askep-bw-input) solid var(--askep-color-border) !important;
+  border-radius : 0 !important;
+}
+.askep .askep-line.askep-line {
+  display       : inline-block !important;
+  height        : auto !important;
+  min-height    : 0 !important;
+  padding       : 1px 4px !important;
+  font-family   : var(--askep-font) !important;
+  font-size     : var(--askep-fs-input) !important;
+  line-height   : var(--askep-line-height) !important;
+  color         : var(--askep-color-text) !important;
+  background    : transparent !important;
+  border        : 0 !important;
+  border-bottom : var(--askep-bw-input) solid var(--askep-color-border) !important;
+  border-radius : 0 !important;
+  box-shadow    : none !important;
+  vertical-align: baseline !important;
+}
+.askep .askep-line.askep-line--center { text-align: center !important; }
+
+/* varian kotak pada lapisan pengunci */
+.askep .askep-input.askep-input--inline {
+  width : auto !important;
+  flex  : 1 1 auto !important;
+}
+
+.askep .askep-input.askep-input--boxed,
+.askep .askep-textarea.askep-textarea--boxed,
+.askep .askep-select.askep-select--boxed,
+.askep .askep-value.askep-value--boxed {
+  padding       : var(--askep-pad-y) var(--askep-pad-x) !important;
+  background    : #fff !important;
+  border        : 1px solid var(--askep-color-border) !important;
+  border-radius : var(--askep-radius) !important;
+}
+
+.askep .askep-w-40.askep-w-40   { width: 40px  !important; }
+.askep .askep-w-50.askep-w-50   { width: 50px  !important; }
+.askep .askep-w-60.askep-w-60   { width: 60px  !important; }
+.askep .askep-w-80.askep-w-80   { width: 80px  !important; }
+.askep .askep-w-100.askep-w-100 { width: 100px !important; }
+.askep .askep-w-120.askep-w-120 { width: 120px !important; }
+.askep .askep-w-150.askep-w-150 { width: 150px !important; }
+.askep .askep-w-180.askep-w-180 { width: 180px !important; }
+.askep .askep-w-200.askep-w-200 { width: 200px !important; }
+.askep .askep-w-250.askep-w-250 { width: 250px !important; }
+.askep .askep-w-full.askep-w-full { width: 100% !important; }
+
+.askep .askep-header-ident-value.askep-header-ident-value input {
+  width       : 100% !important;
+  text-align  : right !important;   /* seragam dengan nilai statis di atasnya */
+  height      : auto !important;
+  padding     : 0 !important;
+  font-family : var(--askep-font) !important;
+  font-size   : var(--askep-fs-input) !important;
+  font-weight : bold !important;
+  color       : var(--askep-color-text) !important;
+  background  : transparent !important;
+  border      : 0 !important;
+  box-shadow  : none !important;
+}
+
+.askep .askep-check.askep-check > input[type="checkbox"],
+.askep .askep-radio.askep-radio > input[type="radio"] {
+  -webkit-appearance : none !important;
+          appearance : none !important;
+  width         : var(--askep-box-size) !important;
+  height        : var(--askep-box-size) !important;
+  min-width     : var(--askep-box-size) !important;
+  min-height    : var(--askep-box-size) !important;
+  margin        : 0 !important;
+  padding       : 0 !important;
+  background    : #fff !important;
+  border        : 0.7px solid var(--askep-color-border-dark) !important;
+  border-radius : 1px !important;
+  box-shadow    : none !important;
+  position      : relative !important;
+  flex          : 0 0 auto !important;
+}
+.askep .askep-radio.askep-radio > input[type="radio"] { border-radius: 50% !important; }
+
+.askep .askep-label.askep-label {
+  display     : block !important;
+  margin      : 0 0 var(--askep-gap-label) !important;
+  font-family : var(--askep-font) !important;
+  font-size   : var(--askep-fs-label) !important;
+  font-weight : 400 !important;
+  line-height : var(--askep-line-height) !important;
+  color       : var(--askep-color-text) !important;
+}
+.askep .askep-check.askep-check,
+.askep .askep-radio.askep-radio {
+  margin      : 0 !important;
+  font-size   : var(--askep-fs-label) !important;
+  font-weight : 400 !important;
+}
+.askep .askep-hint.askep-hint {
+  font-size  : var(--askep-fs-hint) !important;
+  font-style : italic !important;
+  color      : var(--askep-color-hint) !important;
+}
+.askep .askep-header.askep-header      { display: flex !important; }
+.askep .askep-header-left.askep-header-left { display: flex !important; }
+/* varian dua sisi / satu kolom ditulis SETELAHNYA supaya menang di cascade */
+.askep .askep-header.askep-header--split {
+  display               : grid !important;
+  grid-template-columns : var(--askep-header-cols, 1fr auto) !important;
+}
+.askep .askep-header.askep-header--stack { display: block !important; }
+.askep .askep-header-ident-row.askep-header-ident-row { display: flex !important; }
+.askep .askep-header-ident-row > .askep-header-ident-value.askep-header-ident-value {
+  flex      : 0 0 var(--askep-ident-row) !important;
+  width     : var(--askep-ident-row) !important;
+  max-width : 100% !important;
+}
+.askep .askep-header-ident.askep-header-ident {
+  display               : grid !important;
+  width                 : var(--askep-ident-width) !important;
+  grid-template-columns : var(--askep-ident-key) var(--askep-ident-value) !important;
+  font-size             : var(--askep-ident-fs) !important;
+}
+.askep .askep-footer-side .askep-footer-row.askep-footer-row { flex-wrap: wrap; }
+
+/* label pada tata letak "Label : isian" tidak boleh berjarak ke bawah */
+.askep .askep-field--inline > .askep-label.askep-label {
+  margin        : 0 !important;
+  padding-right : 10px !important;
+}
+/* kotak satu karakter tidak boleh diseragamkan aturan host */
+.askep .askep-box.askep-box {
+  display       : inline-block !important;
+  width         : 7mm !important;
+  height        : var(--askep-input-height) !important;
+  min-height    : 0 !important;
+  padding       : 0 !important;
+  text-align    : center !important;
+  font-family   : var(--askep-font) !important;
+  font-size     : var(--askep-fs-input) !important;
+  color         : var(--askep-color-text) !important;
+  background    : #fff !important;
+  border        : 1px solid var(--askep-color-border) !important;
+  border-radius : 2px !important;
+  box-shadow    : none !important;
+}
+
+.askep.askep-page.askep-page {
+  box-sizing : border-box !important;
+  width      : 100% !important;
+  max-width  : var(--askep-page-width) !important;
+}
+
+</style>
+
+<div class="askep askep-page">
+  <form class="smart-form" data-ttd="yes">
+
+  <div class="askep-header askep-header--split askep-header--divided" style="--askep-header-cols: 1fr 62mm">
+    <div class="askep-header-left askep-side--left"><div class="askep-header-logo" style="--askep-logo-width: 18mm"><img src="{V_PETH}{VLOGO}" alt="Logo RS"></div><div class="askep-header-hospital"><div class="askep-header-name">{RS_NAMA}</div><div class="askep-header-address">{RS_ALAMAT}<br>Telp. {RS_TELEPON} | Fax. {RS_FAX}</div><div class="askep-header-title">ASESMEN AWAL KEPERAWATAN RAWAT INAP</div></div></div>
+    <div class="askep-header-right askep-side--right"><div class="askep-header-ident askep-header-ident--right" style="--askep-ident-width: 100%;--askep-ident-key: minmax(0, 1fr);--askep-ident-value: 30mm"><span class="askep-header-ident-key">No. RM</span><span class="askep-header-ident-value">{NO_RM}</span><span class="askep-header-ident-key">Nama</span><span class="askep-header-ident-value">{NAME_REAL}</span><span class="askep-header-ident-key">Tgl Lahir</span><span class="askep-header-ident-value">{TGL_LAHIR}</span></div></div>
+  </div>
+    <div class="askep-body">
+
+  <div class="askep-section">
+    <div class="askep-section-title">A. Identitas Pasien</div>
+    <div class="askep-section-content">
+      <div class="askep-field askep-field--inline" style="--askep-kv-width: 170px"><label class="askep-label askep-label--colon">Nama Pasien</label><span class="askep-value askep-value--strong">{NAME_REAL}</span></div>
+      <div class="askep-field askep-field--inline" style="--askep-kv-width: 170px"><label class="askep-label askep-label--colon">No. Rekam Medis</label><span class="askep-value askep-value--strong">{NO_RM}</span></div>
+      <div class="askep-field askep-field--inline" style="--askep-kv-width: 170px"><label class="askep-label askep-label--colon" for="tgl_masuk">Tanggal Masuk</label><input type="text" class="askep-input askep-input--inline datepickerBoots" name="tgl_masuk" id="tgl_masuk" placeholder="dd-mm-yy" style="width:140px !important;flex:0 0 auto !important" myid="check_cara"></div>
+      <div class="askep-field askep-field--inline" style="--askep-kv-width: 170px"><label class="askep-label askep-label--colon" for="ruang">Ruang Perawatan</label><select class="askep-select" name="ruang" id="ruang" style="width:45% !important" myid="check_cara"><option value="">- Pilih -</option><option value="Melati">Melati</option><option value="Anggrek">Anggrek</option><option value="ICU">ICU</option></select></div>
+    </div>
+  </div>
+
+  <div class="askep-section">
+    <div class="askep-section-title">B. Antropometri</div>
+    <div class="askep-section-content">
+      <div class="askep-grid askep-grid--3" style="--askep-cols: 1fr 1fr 1fr">
+        <div class="askep-field"><label class="askep-label" for="bb">Berat Badan</label><div class="askep-options askep-options--baseline"><input type="number" class="askep-input askep-input--inline" name="bb" id="bb" style="width:70px !important;flex:0 0 auto !important" myid="check_cara"><span>kg</span></div></div>
+        <div class="askep-field"><label class="askep-label" for="tb">Tinggi Badan</label><div class="askep-options askep-options--baseline"><input type="number" class="askep-input askep-input--inline" name="tb" id="tb" style="width:70px !important;flex:0 0 auto !important" myid="check_cara"><span>cm</span></div></div>
+        <div class="askep-field"><label class="askep-label" for="imt">IMT</label><div class="askep-options askep-options--baseline"><input type="number" class="askep-input askep-input--inline" name="imt" id="imt" readonly style="width:70px !important;flex:0 0 auto !important" myid="check_cara"><span>kg/m²</span></div><div class="askep-hint">terisi otomatis</div></div>
+      </div>
+      <div class="askep-gap askep-no-print"><a class="askep-btn pointer" id="btnHitungIMT">Hitung IMT</a></div>
+    </div>
+  </div>
+
+  <div class="askep-section">
+    <div class="askep-section-title">C. Skrining Nyeri</div>
+    <div class="askep-section-content">
+      <div class="askep-field"><label class="askep-label" for="skala_nyeri">Skala Nyeri (NRS)</label><div class="askep-scale"><span class="askep-scale-end">0 = tidak nyeri</span><label class="askep-scale-item"><span>0</span><input type="radio" name="skala_nyeri" value="0" myid="check_cara"></label><label class="askep-scale-item"><span>1</span><input type="radio" name="skala_nyeri" value="1" myid="check_cara"></label><label class="askep-scale-item"><span>2</span><input type="radio" name="skala_nyeri" value="2" myid="check_cara"></label><label class="askep-scale-item"><span>3</span><input type="radio" name="skala_nyeri" value="3" myid="check_cara"></label><label class="askep-scale-item"><span>4</span><input type="radio" name="skala_nyeri" value="4" myid="check_cara"></label><label class="askep-scale-item"><span>5</span><input type="radio" name="skala_nyeri" value="5" myid="check_cara"></label><label class="askep-scale-item"><span>6</span><input type="radio" name="skala_nyeri" value="6" myid="check_cara"></label><label class="askep-scale-item"><span>7</span><input type="radio" name="skala_nyeri" value="7" myid="check_cara"></label><label class="askep-scale-item"><span>8</span><input type="radio" name="skala_nyeri" value="8" myid="check_cara"></label><label class="askep-scale-item"><span>9</span><input type="radio" name="skala_nyeri" value="9" myid="check_cara"></label><label class="askep-scale-item"><span>10</span><input type="radio" name="skala_nyeri" value="10" myid="check_cara"></label><span class="askep-scale-end">10 = nyeri hebat</span></div></div>
+      <div class="askep-grid">
+        <div class="askep-field"><label class="askep-label" for="lokasi_nyeri">Lokasi Nyeri</label><input type="text" class="askep-input" name="lokasi_nyeri" id="lokasi_nyeri" myid="check_cara"></div>
+        <div class="askep-field"><label class="askep-label" for="kualitas_nyeri">Kualitas</label><select class="askep-select" name="kualitas_nyeri" id="kualitas_nyeri" myid="check_cara"><option value="">- Pilih -</option><option value="Tertusuk">Tertusuk</option><option value="Tertekan">Tertekan</option><option value="Terbakar">Terbakar</option><option value="Kram">Kram</option></select></div>
+      </div>
+      <div class="askep-field"><label class="askep-label" for="pencetus">Faktor Pencetus</label><div class="askep-options askep-options--baseline"><label class="askep-check"><input type="checkbox" name="pencetus[]" value="Gerakan" myid="check_cara"> Gerakan</label><label class="askep-check"><input type="checkbox" name="pencetus[]" value="Istirahat" myid="check_cara"> Istirahat</label><label class="askep-check"><input type="checkbox" name="pencetus[]" value="Lainnya" myid="check_cara"> Lainnya</label><input type="text" class="askep-line" name="pencetus_lain" id="pencetus_lain" style="width:120px !important;flex:0 0 auto !important" myid="check_cara"></div></div>
+    </div>
+  </div>
+
+  <div class="askep-section">
+    <div class="askep-section-title">D. Skrining Risiko Jatuh</div>
+    <div class="askep-section-content">
+      <div class="askep-table-wrap"><table class="askep-table"><thead><tr><th>Parameter</th><th style="width:52px">Ya</th><th style="width:52px">Tidak</th><th>Skor</th></tr></thead><tbody><tr><td>Riwayat jatuh dalam 3 bulan terakhir</td><td class="askep-center"><label class="askep-check"><input type="radio" name="jatuh_riwayat" value="Ya" myid="check_cara"></label></td><td class="askep-center"><label class="askep-check"><input type="radio" name="jatuh_riwayat" value="Tidak" myid="check_cara"></label></td><td><input type="text" class="askep-line askep-w-full" name="jatuh_riwayat_ket" id="jatuh_riwayat_ket" myid="check_cara"></td></tr><tr><td>Diagnosis sekunder (&gt; 1 diagnosis)</td><td class="askep-center"><label class="askep-check"><input type="radio" name="jatuh_diagnosis" value="Ya" myid="check_cara"></label></td><td class="askep-center"><label class="askep-check"><input type="radio" name="jatuh_diagnosis" value="Tidak" myid="check_cara"></label></td><td><input type="text" class="askep-line askep-w-full" name="jatuh_diagnosis_ket" id="jatuh_diagnosis_ket" myid="check_cara"></td></tr><tr><td>Alat bantu jalan</td><td class="askep-center"><label class="askep-check"><input type="radio" name="jatuh_alat" value="Ya" myid="check_cara"></label></td><td class="askep-center"><label class="askep-check"><input type="radio" name="jatuh_alat" value="Tidak" myid="check_cara"></label></td><td><input type="text" class="askep-line askep-w-full" name="jatuh_alat_ket" id="jatuh_alat_ket" myid="check_cara"></td></tr><tr><td>Terpasang infus / heparin lock</td><td class="askep-center"><label class="askep-check"><input type="radio" name="jatuh_infus" value="Ya" myid="check_cara"></label></td><td class="askep-center"><label class="askep-check"><input type="radio" name="jatuh_infus" value="Tidak" myid="check_cara"></label></td><td><input type="text" class="askep-line askep-w-full" name="jatuh_infus_ket" id="jatuh_infus_ket" myid="check_cara"></td></tr></tbody></table></div>
+      <div class="askep-field"><label class="askep-label" for="jatuh_total">Total Skor</label><div class="askep-score"><input type="text" class="askep-input askep-input--inline askep-input--boxed askep-line--center" name="jatuh_total" id="jatuh_total" style="width:60px !important;flex:0 0 auto !important;text-align:center" myid="check_cara"><span class="askep-score-note">0-24 rendah · 25-44 sedang · ≥45 tinggi</span></div></div>
+      <div class="askep-field"><label class="askep-label" for="jatuh_tindak">Tindak Lanjut</label><div class="askep-options"><label class="askep-radio"><input type="radio" name="jatuh_tindak" value="Tanpa intervensi" myid="check_cara"> Tanpa intervensi</label><label class="askep-radio"><input type="radio" name="jatuh_tindak" value="Intervensi standar" myid="check_cara"> Intervensi standar</label><label class="askep-radio"><input type="radio" name="jatuh_tindak" value="Intervensi risiko tinggi" myid="check_cara"> Intervensi risiko tinggi</label></div></div>
+    </div>
+  </div>
+
+    </div>
+
+  <div class="askep-footer">
+    <div class="askep-footer-row">
+      <div class="askep-sign"><div class="askep-sign-place">Bandung, <input type="text" class="askep-line askep-w-120 askep-line--center datepickerBoots" name="tgl_ttd_1" id="tgl_ttd_1" placeholder="dd-mm-yy" myid="check_cara"> &nbsp;Jam <input type="text" class="askep-line askep-w-50 askep-line--center" name="jam_ttd_1" id="jam_ttd_1" myid="check_cara"> WIB</div><div class="askep-sign-role">Petugas</div><div class="askep-sign-area"><div id="back_img_1"></div><img id="image_paraf_1" src="" alt="" style="display:none;"><input type="hidden" name="paraf_1" id="paraf_1" data-name="paraf" data-id="1" myid="check_cara"><input type="hidden" name="paraf_txt_1" id="paraf_txt_1" myid="check_cara"><input type="hidden" name="data_id[]" value="1" myid="check_cara"></div><div class="askep-sign-name askep-print-only">( ................................. )</div><div class="askep-sign-note">Tanda Tangan &amp; Nama Terang</div><div class="askep-gap askep-no-print"><a id="CreateTTD" class="askep-btn pointer" data-id="1">TTD Pentablet</a></div></div>
+    </div>
+  </div>
+
+
+  </form>
+</div>

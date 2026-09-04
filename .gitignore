@@ -1,0 +1,7 @@
+.zed/
+.vscode/
+.askep/
+dist/
+
+askep.config.yaml
+test.yaml
