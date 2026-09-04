@@ -35,17 +35,30 @@ secara manual.
 git clone <repo-ini>
 cd askep-sync
 
-# 1. bangun frontend (hasilnya masuk ke form-builder/dist)
-just build
-# setara dengan:
-#   cd form-builder && pnpm install && pnpm run build
-
-# 2. bangun biner askep (menyertakan dist/ dari langkah 1)
-go build -o askep .
+just build     # build frontend (form-builder/dist), lalu compile ke dist/askep-sync
+# atau, kalau ingin langsung terpasang di $GOBIN/$GOPATH/bin:
+just install
 ```
 
-Setelah itu binernya berdiri sendiri (`./askep`) — bisa dipindah ke mesin lain
-tanpa perlu Node.js/pnpm lagi, karena frontend sudah ikut ter-*embed*.
+`just build`/`just install` setara dengan:
+
+```bash
+cd form-builder && pnpm install && pnpm run build && cd ..
+go build -o dist/askep-sync .   # atau: go install .
+```
+
+> [!WARNING]
+> Urutan argumen `go build` penting — flag (`-o ...`) harus ditulis **sebelum**
+> path package (`.`). `go build . -o ...` akan gagal dengan pesan
+> `malformed import path` karena `go build` berhenti mem-parsing flag begitu
+> menemui argumen non-flag pertama.
+
+Binernya (`dist/askep-sync`, atau nama lain lewat `-o`) berdiri sendiri — bisa
+dipindah ke mesin lain tanpa perlu Node.js/pnpm lagi, karena frontend sudah
+ikut ter-*embed*. Semua contoh perintah di bawah mengasumsikan biner itu
+dipanggil sebagai `askep-sync` (lewat `$PATH` atau `./dist/askep-sync`); nama
+sub-command-nya sendiri (`init`/`sync`/`serve`) tetap sama walau nama berkas
+binernya diganti.
 
 ---
 
@@ -57,7 +70,7 @@ Membuat `askep.config.yaml` di direktori kerja saat ini dari template bawaan.
 Tidak melakukan apa-apa (hanya memberi peringatan) kalau berkas itu sudah ada.
 
 ```bash
-askep init
+askep-sync init
 ```
 
 ### `askep sync <target...> [flags]`
@@ -68,9 +81,9 @@ satu database `profile`. Bisa menerima lebih dari satu nama target sekaligus
 (disinkronkan paralel).
 
 ```bash
-askep sync imunisasi                 # sync ke profile "default"
-askep sync imunisasi test -p master  # sync dua target ke profile "master"
-askep sync imunisasi --dry           # cetak HTML hasil compile, tanpa sentuh DB
+askep-sync sync imunisasi                 # sync ke profile "default"
+askep-sync sync imunisasi test -p master  # sync dua target ke profile "master"
+askep-sync sync imunisasi --dry           # cetak HTML hasil compile, tanpa sentuh DB
 ```
 
 | Flag | Alias | Bawaan | Keterangan |
@@ -89,8 +102,8 @@ Menjalankan HTTP server yang menyediakan API + web form builder (lihat bagian
 kerja saat ini.
 
 ```bash
-askep serve                  # 0.0.0.0:5180 (atau ikut server.host/port di config)
-askep serve -H 127.0.0.1 -p 8080
+askep-sync serve                  # 0.0.0.0:5180 (atau ikut server.host/port di config)
+askep-sync serve -H 127.0.0.1 -p 8080
 ```
 
 | Flag | Alias | Bawaan | Keterangan |
@@ -180,8 +193,8 @@ tersambung ke server:
 ```bash
 just fe      # Vite dev server (frontend saja), http://localhost:5173, proxy /api -> :5180
 just serve   # go run -tags dev . serve — hanya API, frontend dilayani just fe di atas
-just build   # build ulang form-builder/dist (dibutuhkan sebelum `go build` produksi)
-just install # build dan install form-builder dan cli ke GOBIN
+just build   # build frontend + compile biner produksi ke dist/askep-sync
+just install # build frontend + `go install .` (biner masuk ke $GOBIN/$GOPATH/bin)
 ```
 
 Build tag `dev` mematikan static-file serving di sisi Go (`internal/api/gui_dev.go`)
