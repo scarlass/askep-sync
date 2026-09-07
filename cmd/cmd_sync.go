@@ -20,12 +20,11 @@ type SyncCmdFlags struct {
 
 var (
 	SyncCmd = &cobra.Command{
-		Use:      "sync targets...",
-		Short:    "synchronize target template to askep_list table",
-		Long:     "synchronize target template to askep_list table and change form_data column",
-		PreRunE:  SyncPreRun,
-		RunE:     configs.SetupRun(SyncRun),
-		PostRunE: SyncPostRun,
+		Use:     "sync targets...",
+		Short:   "synchronize target template to askep_list table",
+		Long:    "synchronize target template to askep_list table and change form_data column",
+		PreRunE: SyncPreRun,
+		RunE:    configs.SetupRun(SyncRun),
 
 		Args:         cobra.MinimumNArgs(1),
 		SilenceUsage: true,
@@ -50,6 +49,9 @@ func SyncPreRun(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	if len(project.Conf.Targets) == 0 {
+		return core.ErrEmptyTargets
+	}
 	if len(args) == 0 {
 		return core.ErrEmptyInputTargets
 	}
@@ -133,10 +135,5 @@ func SyncRun(cmd *cobra.Command, args []string) error {
 		wg.Wait()
 	}
 
-	return nil
-}
-
-func SyncPostRun(cmd *cobra.Command, args []string) error {
-	// SyncFlags.project.Close()
 	return nil
 }

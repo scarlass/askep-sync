@@ -19,10 +19,6 @@ func loadProject() (project *core.Project, cwd string, err error) {
 
 	// logger.JsonPrint(conf)
 
-	if len(conf.Targets) == 0 {
-		return nil, cwd, core.ErrEmptyTargets
-	}
-
 	project, err = core.NewProject(cwd, conf)
 	return
 }

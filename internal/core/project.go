@@ -1,6 +1,7 @@
 package core
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -142,6 +143,7 @@ func (pr *Project) AddTarget(name string, conf *configs.TargetConfig) (*Target, 
 func (pr *Project) UseTarget(names ...string) ([]*Target, error) {
 	targets := make([]*Target, 0)
 
+	errs := []error{}
 	for _, name := range names {
 		found := false
 		for _, trg := range pr.targets {
@@ -153,8 +155,13 @@ func (pr *Project) UseTarget(names ...string) ([]*Target, error) {
 		}
 
 		if !found {
-			return nil, fmt.Errorf("target %q not found in project configuration", name)
+			errs = append(errs, fmt.Errorf("target %q not found in project configuration", name))
+			continue
 		}
+	}
+
+	if len(errs) > 0 {
+		return nil, errors.Join(errs...)
 	}
 
 	return targets, nil

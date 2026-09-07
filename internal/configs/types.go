@@ -12,15 +12,15 @@ type (
 		Config *ProjectConfig `yaml:"config"`
 	}
 	ProjectConfig struct {
-		Server   ServerConfig              `yaml:"server"`
+		Server   ServerConfig              `yaml:"server,omitempty"`
 		Profiles map[string]*ProfileConfig `yaml:"profiles"`
 		Targets  map[string]*TargetConfig  `yaml:"targets"`
 	}
 )
 
 type ServerConfig struct {
-	Host string `yaml:"host"`
-	Port int    `yaml:"port"`
+	Host string `yaml:"host,omitempty"`
+	Port int    `yaml:"port,omitempty"`
 }
 
 type (
@@ -34,29 +34,28 @@ type (
 		Proxy    *ProfileProxyConfig `yaml:"proxy,omitempty"`
 	}
 	ProfileProxyConfig struct {
-		Host     string `yaml:"host"`
-		Port     int    `yaml:"port"`
-		User     string `yaml:"user"`
-		Password string `yaml:"password"`
+		Host     string `yaml:"host,omitempty"`
+		Port     int    `yaml:"port,omitempty"`
+		User     string `yaml:"user,omitempty"`
+		Password string `yaml:"password,omitempty"`
 	}
 )
 
 type (
 	// mapping alid per database profile
 	TargetConfig struct {
-		Name       string
 		Html       string                  `yaml:"html"`
-		Stylesheet []string                `yaml:"stylesheet"`
-		Script     []string                `yaml:"script"`
-		Attributes *TargetAttributesConfig `yaml:"attributes"`
-		Alids      TargetProfileMapConfig  `yaml:"alids"`
+		Stylesheet []string                `yaml:"stylesheet,omitempty"`
+		Script     []string                `yaml:"script,omitempty"`
+		Attributes *TargetAttributesConfig `yaml:"attributes,omitempty"`
+		Alids      TargetProfileMapConfig  `yaml:"alids,omitempty"`
 	}
 	TargetProfileMapConfig map[string]int
 	TargetAttributesConfig struct {
-		NamaForm      string `yaml:"nama-form"`
-		InisialForm   string `yaml:"inisial-form"`
-		KodeForm      string `yaml:"kode-form"`
-		KodeSatusehat string `yaml:"kode-satusehat"`
+		NamaForm      string `yaml:"nama-form,omitempty"`
+		InisialForm   string `yaml:"inisial-form,omitempty"`
+		KodeForm      string `yaml:"kode-form,omitempty"`
+		KodeSatusehat string `yaml:"kode-satusehat,omitempty"`
 	}
 )
 

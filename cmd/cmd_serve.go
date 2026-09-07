@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -12,6 +13,7 @@ import (
 	"github.com/labstack/echo/v5"
 	"github.com/scarlass/askep-sync/internal/api"
 	"github.com/scarlass/askep-sync/internal/configs"
+	"github.com/scarlass/askep-sync/internal/logger"
 	"github.com/scarlass/askep-sync/internal/utils"
 	"github.com/spf13/cobra"
 )
@@ -55,12 +57,18 @@ func ServeRun(cmd *cobra.Command, args []string) error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
 	defer stop()
 
+	logger.Info("\nrunning gui form builder")
 	server := echo.New()
+	server.Logger = slog.New(slog.DiscardHandler)
 	api.Register(server, ServeFlags.FS, project)
 
 	project.MakeTemplateDir()
 
 	defer project.Close()
+
+	go func() {
+		logger.Infof("-> gui served at http://%s:%d", host, port)
+	}()
 
 	conf := echo.StartConfig{Address: fmt.Sprintf("%s:%d", host, port)}
 	if err := conf.Start(ctx, server); err != nil && !errors.Is(err, http.ErrServerClosed) {

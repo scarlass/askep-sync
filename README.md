@@ -15,7 +15,7 @@ secara manual.
 
 ## Instalasi
 
-### Prasyarat
+### Prerequisite
 
 | Kebutuhan | Versi | Guna |
 |---|---|---|
@@ -29,7 +29,7 @@ secara manual.
 > ada di disk **sebelum** `go build`/`go run` dijalankan, kalau tidak proses
 > build Go akan gagal.
 
-### Build dari sumber
+### Build from Source
 
 ```bash
 git clone <repo-ini>
@@ -62,9 +62,9 @@ binernya diganti.
 
 ---
 
-## Daftar command
+## Command List
 
-### `askep init`
+### `askep-sync init`
 
 Membuat `askep.config.yaml` di direktori kerja saat ini dari template bawaan.
 Tidak melakukan apa-apa (hanya memberi peringatan) kalau berkas itu sudah ada.
@@ -73,7 +73,7 @@ Tidak melakukan apa-apa (hanya memberi peringatan) kalau berkas itu sudah ada.
 askep-sync init
 ```
 
-### `askep sync <target...> [flags]`
+### `askep-sync sync <target...> [flags]`
 
 Merender HTML target lalu menulisnya ke kolom `form_data` (dan atribut terkait)
 pada baris `askep_list` yang dipetakan lewat `alids` target tersebut, untuk
@@ -95,7 +95,7 @@ Konfigurasi (`askep.config.yaml`) dicari otomatis mulai dari direktori kerja
 saat ini, naik ke direktori induk, sampai ditemukan `askep.config.yaml` (atau
 `askep.config.yml`).
 
-### `askep serve [flags]`
+### `askep-sync serve [flags]`
 
 Menjalankan HTTP server yang menyediakan API + web form builder (lihat bagian
 [Web builder](#web-builder-form-builder) di bawah) untuk project di direktori

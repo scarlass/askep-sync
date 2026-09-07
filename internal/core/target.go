@@ -55,8 +55,13 @@ func (t *Target) Output() (string, error) {
 			}
 
 			content, _ := os.ReadFile(style)
-			section := fmt.Sprintf("<style>\n%s\n</style>", string(content))
+			lines := strings.Split(string(content), "\n")
+			for i, line := range lines {
+				lines[i] = strings.Repeat(" ", 4) + line
+			}
+			content = []byte(strings.Join(lines, "\n"))
 
+			section := fmt.Sprintf("<style>\n%s\n</style>", string(content))
 			stylesheets = append(stylesheets, section)
 		}
 	}
@@ -68,8 +73,13 @@ func (t *Target) Output() (string, error) {
 			}
 
 			content, _ := os.ReadFile(script)
-			section := fmt.Sprintf("<script>\n%s\n</script>", string(content))
+			lines := strings.Split(string(content), "\n")
+			for i, line := range lines {
+				lines[i] = strings.Repeat(" ", 4) + line
+			}
+			content = []byte(strings.Join(lines, "\n"))
 
+			section := fmt.Sprintf("<script>\n%s\n</script>", string(content))
 			scripts = append(scripts, section)
 		}
 	}
