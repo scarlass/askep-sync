@@ -23,7 +23,7 @@ type Target struct {
 	isFromBuilder bool
 	html          string
 	stylesheets   []string
-	scripts       []string
+	scripts       []string // static (non-builder) targets only — resolved once in resolve(); builder targets resolve fresh in Output()
 }
 
 func NewTarget(name string, project *Project, conf *configs.TargetConfig) (*Target, error) {
@@ -66,8 +66,24 @@ func (t *Target) Output() (string, error) {
 		}
 	}
 
-	if len(t.scripts) > 0 {
-		for _, script := range t.scripts {
+	scriptFiles := t.scripts
+	if t.isFromBuilder {
+		// Resolved fresh on every call (not cached at resolve()-time) so
+		// scripts added/edited/removed through the Script tab while the
+		// server is running — which mutate t.Conf.Script in place — are
+		// picked up immediately.
+		scriptFiles = make([]string, 0, len(t.Conf.Script))
+		for _, scr := range t.Conf.Script {
+			p, perr := t.resolve_path(scr, "")
+			if perr != nil {
+				continue
+			}
+			scriptFiles = append(scriptFiles, p)
+		}
+	}
+
+	if len(scriptFiles) > 0 {
+		for _, script := range scriptFiles {
 			if exists := utils.FileExist(script); !exists {
 				continue
 			}
@@ -121,6 +137,17 @@ func (t *Target) Output() (string, error) {
 	return string(html), nil
 }
 
+// ResolveScript resolves the on-disk path of the index-th entry in
+// Conf.Script (the target's `script:` config list — both manually configured
+// paths and builder-created files registered into it), reusing the same
+// {{ cwd }}/{{ target }} substitution and relative-path handling as resolve().
+func (t *Target) ResolveScript(index int) (string, error) {
+	if index < 0 || index >= len(t.Conf.Script) {
+		return "", fmt.Errorf("script index %d out of range", index)
+	}
+	return t.resolve_path(t.Conf.Script[index], "")
+}
+
 func (t *Target) Attributes() *configs.TargetAttributesConfig {
 	if t.Conf.Attributes == nil {
 		return &configs.TargetAttributesConfig{}
@@ -161,10 +188,17 @@ func (t *Target) resolve() (err error) {
 			return fmt.Errorf("invalid builder template reference %q for target %s: %w", raw_path, t.name, err)
 		}
 
-		t.html = configs.TemplateDir(t.project.cwd, "templates", id.String()+".html")
+		tmpl, terr := NewTemplate(t.project, &configs.TemplateConfig{ID: id})
+		if terr != nil {
+			return terr
+		}
+
+		t.html = tmpl.JoinPath("template.html")
 		if !utils.FileExist(t.html) {
 			return fmt.Errorf(err_empty_html, t.name, t.html)
 		}
+
+		t.isFromBuilder = true
 		return nil
 	}
 

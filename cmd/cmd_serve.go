@@ -64,6 +64,8 @@ func ServeRun(cmd *cobra.Command, args []string) error {
 
 	project.MakeTemplateDir()
 
+	go project.WatchConfig(ctx)
+
 	defer project.Close()
 
 	go func() {

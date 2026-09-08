@@ -60,6 +60,7 @@ func Find(config string) (cwd, resolved string, err error) {
 		} else if info.IsDir() {
 			return cwd, config, errors.New("config path is a directory")
 		}
+		resolved = config
 	}
 	return
 }

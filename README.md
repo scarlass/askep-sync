@@ -35,7 +35,9 @@ secara manual.
 git clone <repo-ini>
 cd askep-sync
 
-just build     # build frontend (form-builder/dist), lalu compile ke dist/askep-sync
+# build frontend (form-builder/dist), lalu compile ke dist/askep-sync
+just build
+
 # atau, kalau ingin langsung terpasang di $GOBIN/$GOPATH/bin:
 just install
 ```

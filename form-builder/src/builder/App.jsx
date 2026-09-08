@@ -7,6 +7,7 @@ import {
 import {
     listProfiles, listTargets, createTarget, getTargetMetadata, saveTargetMetadata, saveTargetAttributes,
     previewTargetHtml, syncTarget, getBlocks, saveBlocks,
+    listTargetScripts, createTargetScript, getTargetScriptContent, saveTargetScriptContent, deleteTargetScript,
 } from "../api/client.js";
 import { generateHtml, generatePreview, summarise } from "./generate.js";
 import Inspector from "./Inspector.jsx";
@@ -62,7 +63,15 @@ export default function App() {
     const [form, setForm] = useState(makeForm);
     const [sel, setSel] = useState(null);        // {sec, row, cell} | {sec} | null
     const [showPreview, setShowPreview] = useState(true);
-    const [tab, setTab] = useState("preview");   // preview | html
+    const [tab, setTab] = useState("preview");   // preview | html | script
+
+    /* tab Script: daftar file .js per template (builder-managed di
+       .askep/<uuid>/*.js, ditambah entri manual dari yaml `script:`),
+       diedit lewat editor bawaan. */
+    const [scripts, setScripts] = useState([]);            // [{id, name, source}]
+    const [scriptContents, setScriptContents] = useState({}); // {[id]: content}
+    const [activeScriptId, setActiveScriptId] = useState(null);
+    const [scriptSaving, setScriptSaving] = useState(false);
     const [search, setSearch] = useState("");        // pencarian komponen di palet
     const [blocks, setBlocks] = useState([]);
     const [modal, setModal] = useState(false);   // pratinjau layar penuh
@@ -97,7 +106,7 @@ export default function App() {
         return peta;
     }, [form.sections, form.meta.paging?.enabled]);
     const html = useMemo(() => generateHtml(form), [form]);
-    const preview = useMemo(() => generatePreview(form), [form]);
+    const preview = useMemo(() => generatePreview(form, Object.values(scriptContents)), [form, scriptContents]);
     const paging = form.meta.paging || {};
 
     /* Pratinjau samping selalu dirender selebar 860px lalu DIPERKECIL, supaya
@@ -250,6 +259,123 @@ export default function App() {
         return () => { cancelled = true; };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeTarget, forcedBuilder]);
+
+    /* tab Script: id skrip = indeks di target.script (config), jadi
+       berubah tiap kali ada tambah/hapus — selalu muat ulang daftar+isi dari
+       server sesudah mutasi apa pun, jangan tempel/hapus lokal berdasar id
+       lama yang bisa sudah tidak berlaku. */
+    const reloadScripts = async (target, preferId, isCancelled = () => false) => {
+        const list = await listTargetScripts(target);
+        if (isCancelled()) return;
+        setScripts(list);
+        setActiveScriptId((cur) => {
+            const want = preferId !== undefined ? preferId : cur;
+            return list.some((s) => s.id === want) ? want : (list[0]?.id ?? null);
+        });
+        const entries = await Promise.all(list.map(async (s) =>
+            [s.id, await getTargetScriptContent(target, s.id).catch(() => "")]));
+        if (isCancelled()) return;
+        setScriptContents(Object.fromEntries(entries));
+    };
+
+    useEffect(() => {
+        if (!activeTarget || !isBuilderMode) {
+            setScripts([]);
+            setScriptContents({});
+            setActiveScriptId(null);
+            return undefined;
+        }
+        let cancelled = false;
+        reloadScripts(activeTarget, undefined, () => cancelled);
+        return () => { cancelled = true; };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeTarget, isBuilderMode, forcedBuilder]);
+
+    /* askep.config.yaml sekarang bisa berubah di luar app (server watch pakai
+       fsnotify — lihat internal/core/watch.go) — mis. user hapus baris script
+       manual langsung di yaml sementara server jalan. Tab Script tidak tahu
+       ini terjadi kecuali di-poll: selama tab Script aktif, cek ulang daftar
+       tiap beberapa detik. Isi script yang SEDANG dibuka tidak ikut ditimpa
+       supaya tidak menghapus draf yang belum sempat autosave. */
+    const activeScriptIdRef = useRef(activeScriptId);
+    useEffect(() => { activeScriptIdRef.current = activeScriptId; }, [activeScriptId]);
+
+    useEffect(() => {
+        if (tab !== "script" || !activeTarget || !isBuilderMode) return undefined;
+        let cancelled = false;
+        const tick = async () => {
+            try {
+                const list = await listTargetScripts(activeTarget);
+                if (cancelled) return;
+                const activeId = activeScriptIdRef.current;
+                setScripts(list);
+                setActiveScriptId((cur) => (list.some((s) => s.id === cur) ? cur : (list[0]?.id ?? null)));
+                const entries = await Promise.all(
+                    list.filter((s) => s.id !== activeId).map(async (s) =>
+                        [s.id, await getTargetScriptContent(activeTarget, s.id).catch(() => "")])
+                );
+                if (cancelled) return;
+                setScriptContents((prev) => {
+                    const next = Object.fromEntries(entries);
+                    if (activeId && activeId in prev) next[activeId] = prev[activeId];
+                    return next;
+                });
+            } catch { /* transient poll error, ignore */ }
+        };
+        const id = setInterval(tick, 3000);
+        return () => { cancelled = true; clearInterval(id); };
+    }, [tab, activeTarget, isBuilderMode]);
+
+    const addScript = async () => {
+        if (!activeTarget) return;
+        const name = window.prompt("Script file name (e.g. custom.js):");
+        if (!name) return;
+        try {
+            const created = await createTargetScript(activeTarget, name);
+            await reloadScripts(activeTarget, created.id);
+        } catch (err) { window.alert("Cannot create script: " + err.message); }
+    };
+
+    const removeScript = async (id) => {
+        if (!activeTarget || !window.confirm("Delete this script?")) return;
+        try {
+            await deleteTargetScript(activeTarget, id);
+            await reloadScripts(activeTarget, null);
+        } catch (err) { window.alert("Cannot delete script: " + err.message); }
+    };
+
+    /* Script tab: autosave 5s setelah berhenti mengetik, atau langsung lewat
+       Ctrl/Cmd+S. scriptSaveTimer menyimpan debounce yang sedang berjalan
+       supaya bisa di-flush (disimpan segera) saat pindah script/Ctrl+S. */
+    const scriptSaveTimer = useRef(null);
+    const flushScriptSave = () => {
+        if (scriptSaveTimer.current) {
+            clearTimeout(scriptSaveTimer.current);
+            scriptSaveTimer.current = null;
+        }
+    };
+    const doSaveScript = async (target, id, content) => {
+        if (!target || !id) return;
+        setScriptSaving(true);
+        try {
+            await saveTargetScriptContent(target, id, content ?? "");
+        } catch (err) { window.alert("Cannot save script: " + err.message); }
+        finally { setScriptSaving(false); }
+    };
+    const scheduleScriptSave = (target, id, content) => {
+        flushScriptSave();
+        scriptSaveTimer.current = setTimeout(() => {
+            scriptSaveTimer.current = null;
+            doSaveScript(target, id, content);
+        }, 5000);
+    };
+    const switchScript = (id) => {
+        if (activeScriptId && activeScriptId !== id && scriptSaveTimer.current) {
+            flushScriptSave();
+            doSaveScript(activeTarget, activeScriptId, scriptContents[activeScriptId] ?? "");
+        }
+        setActiveScriptId(id);
+    };
 
     /* target baru dari view selalu builder-backed — tidak ada pemilih berkas
        html statis seperti target yang sudah ada di askep.config.yaml */
@@ -952,11 +1078,12 @@ export default function App() {
                                 <div className="tabs">
                                     <button className={tab === "preview" ? "on" : ""} onClick={() => setTab("preview")}>Preview</button>
                                     <button className={tab === "html" ? "on" : ""} onClick={() => setTab("html")}>HTML</button>
+                                    <button className={tab === "script" ? "on" : ""} onClick={() => setTab("script")}>Script</button>
                                     <span className="sp" />
                                     <button className="linkbtn" onClick={() => setModal(true)}>⛶ Full</button>
                                     <button className="linkbtn" onClick={openInTab}>↗ New tab</button>
                                 </div>
-                                {tab === "preview" ? (
+                                {tab === "preview" && (
                                     <div className="side-view" ref={sideBox}>
                                         <iframe title="preview" srcDoc={preview}
                                             sandbox="allow-scripts allow-same-origin"
@@ -966,7 +1093,8 @@ export default function App() {
                                                 transformOrigin: "top left"
                                             }} />
                                     </div>
-                                ) : (
+                                )}
+                                {tab === "html" && (
                                     <Editor defaultLanguage="html"
                                         value={html}
                                         theme="vs-dark"
@@ -983,6 +1111,49 @@ export default function App() {
                                             editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.NumpadSubtract, shrink);
                                         }}
                                     />
+                                )}
+                                {tab === "script" && (
+                                    <div className="side-view" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+                                        <div className="tabs" style={{ overflowX: "auto", flexWrap: "nowrap" }}>
+                                            {scripts.map((s) => (
+                                                <button key={s.id} className={s.id === activeScriptId ? "on" : ""}
+                                                    title={s.name}
+                                                    onClick={() => switchScript(s.id)}>
+                                                    {s.source === "manual" ? "⚙ " : "▤ "}{s.name}
+                                                    {s.source === "builder" && (
+                                                        <span className="linkbtn" title="Delete script"
+                                                            onClick={(e) => { e.stopPropagation(); removeScript(s.id); }}>
+                                                            {" "}✕
+                                                        </span>
+                                                    )}
+                                                </button>
+                                            ))}
+                                            <button className="linkbtn" onClick={addScript}>+ Add script</button>
+                                            <span className="sp" />
+                                            {activeScriptId && <span style={{ opacity: 0.6, fontSize: 12 }}>{scriptSaving ? "Saving…" : "Autosaved"}</span>}
+                                        </div>
+                                        {activeScriptId ? (
+                                            <Editor key={activeScriptId} defaultLanguage="javascript"
+                                                value={scriptContents[activeScriptId] ?? ""}
+                                                theme="vs-dark"
+                                                options={{ minimap: { enabled: false }, fontSize: editorFontSize }}
+                                                onChange={(v) => {
+                                                    const content = v ?? "";
+                                                    setScriptContents((c) => ({ ...c, [activeScriptId]: content }));
+                                                    scheduleScriptSave(activeTarget, activeScriptId, content);
+                                                }}
+                                                onMount={(editor, monaco) => {
+                                                    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+                                                        flushScriptSave();
+                                                        doSaveScript(activeTarget, activeScriptId, editor.getValue());
+                                                    });
+                                                }}
+                                            />
+                                        ) : (
+                                            <div className="palette-note">No scripts yet. Add one, or list one under
+                                                this target's <code>script:</code> in askep.config.yaml.</div>
+                                        )}
+                                    </div>
                                 )}
                                 <div className="stat">
                                     {paging.enabled && <span>pages <b>{stat.pages}</b></span>}

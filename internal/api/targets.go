@@ -85,8 +85,8 @@ func (r *api_routes) CreateTarget(c *echo.Context) error {
 		return c.JSON(400, map[string]string{"error": "target name must use only letters, numbers, - or _"})
 	}
 
-	r.mu.Lock()
-	defer r.mu.Unlock()
+	r.project.Lock()
+	defer r.project.Unlock()
 
 	if r.project.HasTarget(name) {
 		return c.JSON(409, map[string]string{"error": "a target with this name already exists"})
@@ -173,8 +173,8 @@ func (r *api_routes) SaveTargetMetadata(c *echo.Context) error {
 		return c.JSON(400, map[string]string{"error": "metadata is required"})
 	}
 
-	r.mu.Lock()
-	defer r.mu.Unlock()
+	r.project.Lock()
+	defer r.project.Unlock()
 
 	id, hasID := builderID(tc.Html)
 	if !hasID {
@@ -216,8 +216,8 @@ func (r *api_routes) SaveTargetAttributes(c *echo.Context) error {
 		return c.JSON(400, map[string]string{"error": err.Error()})
 	}
 
-	r.mu.Lock()
-	defer r.mu.Unlock()
+	r.project.Lock()
+	defer r.project.Unlock()
 
 	tc, ok := r.project.Conf.Targets[name]
 	if !ok {

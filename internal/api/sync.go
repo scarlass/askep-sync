@@ -40,7 +40,7 @@ func (r *api_routes) SyncTarget(c *echo.Context) error {
 		return c.JSON(400, map[string]string{"error": err.Error()})
 	}
 
-	r.mu.Lock()
+	r.project.Lock()
 	if existing, ok := target.GetProfileAlid(body.Profile); !ok || existing != body.Alid {
 		if target.Conf.Alids == nil {
 			target.Conf.Alids = configs.TargetProfileMapConfig{}
@@ -48,7 +48,7 @@ func (r *api_routes) SyncTarget(c *echo.Context) error {
 		target.Conf.Alids[body.Profile] = body.Alid
 		err = r.project.ConfigWrite()
 	}
-	r.mu.Unlock()
+	r.project.Unlock()
 	if err != nil {
 		return c.JSON(500, map[string]string{"error": err.Error()})
 	}

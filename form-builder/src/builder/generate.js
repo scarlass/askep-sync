@@ -801,13 +801,19 @@ export function generateHtml(form) {
        tebakan heuristik. Nonaktif lewat meta.embedModel = false. */
     const sematan = form.meta?.embedModel === false ? "" :
         '<script type="application/json" id="askep-model">' +
-        JSON.stringify(form).split("</").join("<\\/") + "</script>\n"; return `<style type="text/css">\n${THEME}\n</style>\n\n${generateBody(form)}\n${sematan}`;
+        JSON.stringify(form).split("</").join("<\\/") + "</script>\n";
+    return `<style type="text/css">\n${THEME}\n</style>\n\n${generateBody(form)}\n{{ .Script }}\n${sematan}`;
 }
 
-export function generatePreview(form) {
+/* extraScripts: konten skrip dari tab Script (builder + manual), disematkan
+   sebagai <script> nyata supaya jalan di iframe pratinjau — placeholder
+   {{ .Script }} di generateHtml() cuma diproses backend (Target.Output()),
+   tidak berarti apa-apa untuk browser. */
+export function generatePreview(form, extraScripts = []) {
+    const skrip = extraScripts.filter(Boolean).map((c) => `<script>${c}</script>`).join("\n");
     return `<!doctype html><html lang="id"><head><meta charset="utf-8">` +
         `<style>body{margin:0;background:#fff}\n${THEME}</style></head><body>` +
-        `${generateBody(form)}</body></html>`;
+        `${generateBody(form)}${skrip}</body></html>`;
 }
 
 /* Ringkasan untuk panel statistik */

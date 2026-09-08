@@ -67,6 +67,37 @@ export async function syncTarget(name, profile, alid) {
     return body;
 }
 
+export function listTargetScripts(name) {
+    return req(`/targets/${encodeURIComponent(name)}/scripts`).then((r) => r || []);
+}
+
+export function createTargetScript(name, filename) {
+    return req(`/targets/${encodeURIComponent(name)}/scripts`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: filename }),
+    });
+}
+
+export function getTargetScriptContent(name, id) {
+    return req(`/targets/${encodeURIComponent(name)}/scripts/content?id=${encodeURIComponent(id)}`)
+        .then((r) => r?.content ?? "");
+}
+
+export function saveTargetScriptContent(name, id, content) {
+    return req(`/targets/${encodeURIComponent(name)}/scripts/content`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, content }),
+    });
+}
+
+export function deleteTargetScript(name, id) {
+    return req(`/targets/${encodeURIComponent(name)}/scripts?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+    });
+}
+
 export function getBlocks() {
     return req("/blocks").then((r) => r || []);
 }

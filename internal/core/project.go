@@ -1,11 +1,13 @@
 package core
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/scarlass/askep-sync/internal/configs"
 	"github.com/scarlass/askep-sync/internal/logger"
@@ -20,7 +22,15 @@ type Project struct {
 	profiles  []*Profile
 	targets   []*Target
 	templates []*Template
+
+	mu       sync.Mutex
+	lastConf []byte // last known on-disk content of ConfigPath(), used to tell external edits from our own ConfigWrite()
 }
+
+// Lock/Unlock serialize config-mutating API handlers against each other and
+// against WatchConfig's reload — both end up replacing pr.Conf/profiles/targets.
+func (pr *Project) Lock()   { pr.mu.Lock() }
+func (pr *Project) Unlock() { pr.mu.Unlock() }
 
 func NewProject(cwd string, conf *configs.ProjectConfig) (*Project, error) {
 	project := &Project{
@@ -28,14 +38,30 @@ func NewProject(cwd string, conf *configs.ProjectConfig) (*Project, error) {
 		Conf: conf,
 	}
 
-	if utils.FileExist(configs.TemplateDir(cwd)) {
+	if data, err := os.ReadFile(project.ConfigPath()); err == nil {
+		project.lastConf = data
 	}
 
+	if utils.FileExist(configs.TemplateDir(cwd)) {
+		migrateLegacyTemplates(cwd)
+	}
+
+	profiles, targets, err := buildProfilesAndTargets(project, conf)
+	if err != nil {
+		return nil, err
+	}
+
+	project.profiles = profiles
+	project.targets = targets
+	return project, nil
+}
+
+func buildProfilesAndTargets(project *Project, conf *configs.ProjectConfig) ([]*Profile, []*Target, error) {
 	profiles := make([]*Profile, 0)
 	for key, profileconf := range conf.Profiles {
 		profile, err := NewProfile(key, project, profileconf)
 		if err != nil {
-			return nil, fmt.Errorf("unable configure project profile %s: %w", key, err)
+			return nil, nil, fmt.Errorf("unable configure project profile %s: %w", key, err)
 		}
 
 		profiles = append(profiles, profile)
@@ -45,15 +71,52 @@ func NewProject(cwd string, conf *configs.ProjectConfig) (*Project, error) {
 	for key, targetconf := range conf.Targets {
 		target, err := NewTarget(key, project, targetconf)
 		if err != nil {
-			return nil, fmt.Errorf("unable configure project target %s: %w", key, err)
+			return nil, nil, fmt.Errorf("unable configure project target %s: %w", key, err)
 		}
 
 		targets = append(targets, target)
 	}
 
-	project.profiles = profiles
-	project.targets = targets
-	return project, nil
+	return profiles, targets, nil
+}
+
+// reload re-reads ConfigPath() from disk and, if its content actually changed
+// since the last known state (our own ConfigWrite() included), replaces
+// Conf/profiles/targets in place. Locks internally — called from the watcher
+// goroutine, which does not otherwise hold pr.mu. A parse or
+// target/profile-construction error leaves the previous, still-valid config
+// in place rather than crashing the running server. changed reports whether
+// anything was actually swapped in (false covers both "no real change" and
+// "our own ConfigWrite() triggered this event").
+func (pr *Project) reload() (changed bool, err error) {
+	data, err := os.ReadFile(pr.ConfigPath())
+	if err != nil {
+		return false, err
+	}
+
+	pr.mu.Lock()
+	defer pr.mu.Unlock()
+
+	if bytes.Equal(data, pr.lastConf) {
+		return false, nil
+	}
+
+	conf := new(configs.ProjectConfig)
+	if _, err := configs.FindAndLoad(pr.ConfigPath(), conf); err != nil {
+		return false, err
+	}
+	delete(conf.Targets, "*") // mirrors cmd/utils.go:loadProject
+
+	profiles, targets, err := buildProfilesAndTargets(pr, conf)
+	if err != nil {
+		return false, err
+	}
+
+	pr.Conf = conf
+	pr.profiles = profiles
+	pr.targets = targets
+	pr.lastConf = data
+	return true, nil
 }
 
 func (pr *Project) ID() string {
@@ -66,13 +129,20 @@ func (pr *Project) ConfigPath() string {
 	return filepath.Join(pr.cwd, utils.CONFIGURATION_FILE)
 }
 
+// ConfigWrite marshals Conf and writes it to ConfigPath(). Callers mutating
+// Conf must already hold pr.Lock() (see api_routes handlers) — this keeps it
+// serialized against WatchConfig's reload(), which takes the same lock.
 func (pr *Project) ConfigWrite() error {
 	out, err := yaml.Marshal(pr.Conf)
 	if err != nil {
 		return fmt.Errorf("unable to write into yaml: %w", err)
 	}
 
-	return os.WriteFile(pr.ConfigPath(), out, 0644)
+	if err := os.WriteFile(pr.ConfigPath(), out, 0644); err != nil {
+		return err
+	}
+	pr.lastConf = out
+	return nil
 }
 
 func (pr *Project) MakeTemplateDir() error {
@@ -84,7 +154,6 @@ func (pr *Project) MakeTemplateDir() error {
 	logger.Infof("configure template directory")
 
 	os.MkdirAll(path, 0755)
-	os.MkdirAll(configs.TemplateDir(pr.cwd, "templates"), 0755)
 	// os.WriteFile(configs.TemplateDir(pr.cwd, utils.TEMPLATE_CONFIGURATION_FILE), []byte("version: 1\n"), 0644)
 	return nil
 }

@@ -25,6 +25,11 @@ func Register(e *echo.Echo, fs fs.FS, project *core.Project) {
 	g.PUT("/targets/:name/metadata", r.SaveTargetMetadata)
 	g.PUT("/targets/:name/attributes", r.SaveTargetAttributes)
 	g.POST("/targets/:name/sync", r.SyncTarget)
+	g.GET("/targets/:name/scripts", r.ListTargetScripts)
+	g.POST("/targets/:name/scripts", r.CreateTargetScript)
+	g.GET("/targets/:name/scripts/content", r.GetTargetScriptContent)
+	g.PUT("/targets/:name/scripts/content", r.SaveTargetScriptContent)
+	g.DELETE("/targets/:name/scripts", r.DeleteTargetScript)
 	g.GET("/blocks", r.GetBlocks)
 	g.PUT("/blocks", r.SaveBlocks)
 
@@ -33,7 +38,12 @@ func Register(e *echo.Echo, fs fs.FS, project *core.Project) {
 
 type api_routes struct {
 	project *core.Project
-	mu      sync.Mutex
+
+	// blocksMu guards writes to blocks.json (configs.GlobalBlocksFile) — a
+	// global, per-user file unrelated to askep.config.yaml, so it stays on
+	// its own lock rather than project.Lock() (which serializes Conf
+	// mutations against Project.WatchConfig's reload).
+	blocksMu sync.Mutex
 
 	profilesMu sync.Mutex
 	profiles   map[string]*core.Profile // connected profiles, keyed by name, reused across sync requests

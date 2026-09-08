@@ -29,8 +29,8 @@ func (r *api_routes) SaveBlocks(c *echo.Context) error {
 		return c.JSON(400, map[string]string{"error": err.Error()})
 	}
 
-	r.mu.Lock()
-	defer r.mu.Unlock()
+	r.blocksMu.Lock()
+	defer r.blocksMu.Unlock()
 
 	if err := os.WriteFile(configs.GlobalBlocksFile(), body, 0644); err != nil {
 		return c.JSON(500, map[string]string{"error": err.Error()})
