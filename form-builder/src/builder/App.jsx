@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
     CATALOG, GROUPS, PRESETS, MAX_COLS, catalogOf,
-    makeComponent, makeRow, makeSection, makeForm, normalise, normaliseOption, uid, nextParafIndex,
+    makeComponent, makeRow, makeSection, makeForm, normalise, normaliseOption, uid, nextParafIndex, duplicateRow,
     sectionToBlock, blockToSection,
 } from "./model.js";
 import {
@@ -745,6 +745,7 @@ export default function App() {
                         <span className="sp" />
                         <button className="btn mini" onClick={() => moveRow(si, ri, -1)}>↑</button>
                         <button className="btn mini" onClick={() => moveRow(si, ri, 1)}>↓</button>
+                        <button className="btn mini" title="Duplicate row" onClick={() => dupRow(si, ri)}>⎘</button>
                         <button className="btn mini danger" onClick={() => delRow(si, ri)}>✕</button>
                     </div>
                     <div className="cells" style={{
