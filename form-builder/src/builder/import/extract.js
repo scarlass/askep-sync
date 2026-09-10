@@ -150,6 +150,26 @@ export function extractLetterhead(scope, doc) {
    2. TANDA TANGAN / FOOTER
    ========================================================================== */
 const TTD_NAME_RE = /^(paraf|paraf_txt|tgl_ttd|jam_ttd|waktu_ttd|data_id|image_paraf|back_img)/i;
+const ROLE_KEYWORD_RE = /\b(dokter|dpjp|perawat|bidan|petugas|pasien|keluarga|apoteker|ahli gizi|penanggung jawab)[^,\n]{0,30}/i;
+/* teks murni "tanda tangan"/tombol pentablet: bukan nama peran, dibuang dari kandidat */
+const SIGN_PLACEHOLDER_RE = /^(tanda tangan|ttd|pentablet|signature)$/i;
+
+/* Nama peran tanda tangan diambil dari label pendek yang PALING DEKAT dengan
+   area tanda tangan (bukan daftar kata kunci yang selalu ketinggalan satu
+   formulir) — mis. "Yang Menyerahkan"/"Yang Menerima" pada blok serah-terima
+   spesimen, yang tidak memuat kata "dokter/perawat/…" sama sekali. Label
+   administratif berakhiran ":" (mis. "Keterangan:") dan teks penampung
+   ("Tanda Tangan") disingkirkan dari kandidat. Kembali ke pencocokan kata
+   kunci lama bila tidak ada label yang cocok, supaya hasil yang sudah benar
+   hari ini tidak berubah. */
+function roleOf(block, text) {
+    const candidates = [...block.querySelectorAll("label, span, b, strong")]
+        .map((el) => tidyText(textWithoutControls(el)))
+        .filter((t) => t && t.length >= 3 && t.length <= 40 &&
+            !/[:：]\s*$/.test(t) && !SIGN_PLACEHOLDER_RE.test(t));
+    if (candidates.length) return candidates[candidates.length - 1];
+    return (text.match(ROLE_KEYWORD_RE) || [])[0] || "";
+}
 
 export function extractSignatures(scope) {
     const signs = [];
@@ -168,7 +188,7 @@ export function extractSignatures(scope) {
 
     daftar.forEach((block, i) => {
         const text = textWithoutControls(block);
-        const role = (text.match(/\b(dokter|dpjp|perawat|bidan|petugas|pasien|keluarga|apoteker|ahli gizi|penanggung jawab)[^,\n]{0,30}/i) || [])[0];
+        const role = roleOf(block, text);
         const city = (text.match(/^([A-Z][a-zA-Z ]{2,20}),/) || [])[1];
         const num = /paraf_(\d+)/.exec(block.innerHTML);
         block.querySelectorAll(CONTROL).forEach((c) => {
