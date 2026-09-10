@@ -510,6 +510,13 @@ export default function App() {
     /* ---------------- baris ---------------- */
     const addRow = (s, cols) => update((d) => { secAt(d, s).rows.push(makeRow(cols)); });
     const delRow = (s, r) => update((d) => { secAt(d, s).rows.splice(r, 1); });
+    const dupRow = (s, r) => update((d) => {
+        const src = secAt(d, s).rows[r];
+        if (!src) return;
+        const cloned = duplicateRow(src);
+        cloned.cells.forEach((c) => { if (c && c.type === "signature") c.parafIndex = nextParafIndex(d); });
+        secAt(d, s).rows.splice(r + 1, 0, cloned);
+    });
     const moveRow = (s, r, dir) => update((d) => {
         const rows = secAt(d, s).rows, j = r + dir;
         if (j < 0 || j >= rows.length) return;
