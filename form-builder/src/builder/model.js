@@ -236,6 +236,31 @@ export function makeRow(cols = 2) {
     return { id: uid("r"), cols: n, widths: "", cells: Array.from({ length: n }, () => null) };
 }
 
+function bumpField(v) {
+    if (!v) return v;
+    const m = String(v).match(/^(.*)_(\d+)$/);
+    if (m) return `${m[1]}_${Number(m[2]) + 1}`;
+    return `${v}_2`;
+}
+
+export function duplicateRow(row) {
+    const cloned = JSON.parse(JSON.stringify(row));
+    cloned.id = uid("r");
+    cloned.cells = (cloned.cells || []).map((c) => {
+        if (!c) return null;
+        const nc = { ...c, id: uid("c") };
+        if (nc.field) nc.field = bumpField(nc.field);
+        if (nc.fieldTo) nc.fieldTo = bumpField(nc.fieldTo);
+        if (nc.otherField) nc.otherField = bumpField(nc.otherField);
+        if (nc.selectField) nc.selectField = bumpField(nc.selectField);
+        if (Array.isArray(nc.columns)) nc.columns = nc.columns.map((col) => ({ ...col, field: col.field ? bumpField(col.field) : col.field }));
+        if (Array.isArray(nc.items) && nc.type !== "list") nc.items = nc.items.map((it) => ({ ...it, field: it.field ? bumpField(it.field) : it.field, noteField: it.noteField ? bumpField(it.noteField) : it.noteField }));
+        if (nc.type === "list" && Array.isArray(nc.items)) nc.items = nc.items.map((it) => ({ ...it, segs: (it.segs || []).map((s) => ({ ...s, field: s.field ? bumpField(s.field) : s.field })) }));
+        return nc;
+    });
+    return cloned;
+}
+
 export function makeSection(title = "New section", page = 1) {
     return { id: uid("s"), title, page, rows: [makeRow(2)] };
 }

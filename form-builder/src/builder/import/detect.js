@@ -10,7 +10,7 @@
 import { makeComponent } from "../model.js";
 import {
     CONTROL, PLACEHOLDER_RE, tidyText, textWithoutControls, hasControls,
-    directCells, directRows, numFrom,
+    directCells, directRows, numFrom, splitTableHeader,
 } from "./read.js";
 import { markOf, stripMarks } from "./geometry.js";
 
@@ -236,10 +236,13 @@ export function tableKind(table) {
     const rows = directRows(table);
     if (rows.length < 2) return "layout";
 
-    const headRow = rows[0];
-    const headCells = directCells(headRow);
-    const headIsText = headCells.length >= 2 && !hasControls(headRow);
-    const isi = rows.slice(1);
+    /* rowspan/colspan bisa membuat header terdiri dari beberapa <tr> —
+       splitTableHeader() meratakannya; tabel tanpa span mengembalikan
+       persis rows[0]/rows.slice(1) seperti sebelumnya. */
+    const head = splitTableHeader(table);
+    const headCells = head.headerCells;
+    const headIsText = headCells.length >= 2 && !head.headerRows.some((tr) => hasControls(tr));
+    const isi = head.bodyRows;
 
     /* matriks: tiap baris = teks + beberapa sel berisi satu ceklis */
     const matrixRows = isi.filter((tr) => {
@@ -265,9 +268,9 @@ export function tableKind(table) {
 }
 
 export function readDataTable(table) {
-    const rows = directRows(table);
-    const headRow = directCells(rows[0]).map((td) => tidyText(td.textContent));
-    const firstBody = directCells(rows[1]);
+    const head = splitTableHeader(table);
+    const headRow = head.headerCells.map((td) => (td ? tidyText(td.textContent) : ""));
+    const firstBody = directCells(head.bodyRows[0]);
 
     const numbered = /^(no|no\.|nomor)$/i.test(headRow[0] || "");
     const kolom = [];
@@ -285,7 +288,7 @@ export function readDataTable(table) {
     return {
         comp: comp("table", {
             columns: kolom.length ? kolom : [{ head: "Kolom", field: "", width: "" }],
-            rows: Math.max(1, rows.length - 1),
+            rows: Math.max(1, head.bodyRows.length),
             numbered: numbered,
         }),
         confidence: kolom.some((k) => k.field) ? "high" : "medium",
@@ -293,9 +296,9 @@ export function readDataTable(table) {
 }
 
 export function readMatrix(table) {
-    const rows = directRows(table);
-    const headRow = directCells(rows[0]).map((td) => tidyText(td.textContent));
-    const isi = rows.slice(1);
+    const head = splitTableHeader(table);
+    const headRow = head.headerCells.map((td) => (td ? tidyText(td.textContent) : ""));
+    const isi = head.bodyRows;
 
     const sample = directCells(isi[0]);
     const checkCols = sample.filter((td) => {

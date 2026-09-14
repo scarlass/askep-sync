@@ -122,6 +122,73 @@ export function directRows(table) {
     return out;
 }
 
+const GRID_MAX_COLS = 60;
+
+/* --------------------------------------------------------------------------
+   Header multi-baris (rowspan/colspan)
+   ==========================================================================
+   Tabel lama kerap menulis header dalam BEBERAPA <tr> lewat rowspan/colspan
+   (mis. grafik keseimbangan cairan: "Tanggal Pukul" rowspan=4, "Urine"
+   rowspan=3, "Jenis"/"Jumlah" rowspan=2, dst). Kode lama menganggap header
+   selalu satu <tr> (rows[0]) lalu men-zip posisinya begitu saja terhadap
+   baris berikutnya — salah untuk pola ini. splitTableHeader() meratakan
+   rowspan/colspan header ke grid kolom yang benar (satu sel per kolom NYATA,
+   memakai judul PALING DALAM/spesifik bila kolom itu dipecah lagi di baris
+   header berikutnya), lalu memisahkan baris header dari baris isi.
+
+   Tabel TANPA rowspan/colspan sama sekali mengembalikan hasil IDENTIK dengan
+   perilaku lama (headerCells = directCells(rows[0]), bodyRows = rows.slice(1))
+   — supaya tabel yang sudah bekerja hari ini tidak berubah sama sekali. */
+export function splitTableHeader(table) {
+    const rows = directRows(table);
+    if (rows.length < 2) {
+        return { headerCells: directCells(rows[0] || table).filter(Boolean), headerRows: rows.slice(0, 1), bodyRows: [] };
+    }
+
+    const hasSpan = rows.some((tr) => directCells(tr).some((td) =>
+        numFrom(td.getAttribute("rowspan"), 1) > 1 || numFrom(td.getAttribute("colspan"), 1) > 1));
+    if (!hasSpan) {
+        return { headerCells: directCells(rows[0]), headerRows: rows.slice(0, 1), bodyRows: rows.slice(1) };
+    }
+
+    /* baris header = deretan awal baris yang SAMA SEKALI tanpa kontrol —
+       baris isi sungguhan pasti mengandung input/select/textarea. */
+    let headerRowCount = 0;
+    while (headerRowCount < rows.length - 1 && !hasControls(rows[headerRowCount])) headerRowCount += 1;
+    if (headerRowCount < 1) headerRowCount = 1;
+
+    const colHeader = new Map();      // kolom -> <td> judul paling spesifik (baris terdalam menimpa)
+    const reservedThrough = new Map();  // kolom -> indeks baris TERAKHIR yang masih ditahan sel rowspan
+
+    for (let r = 0; r < headerRowCount; r += 1) {
+        const cells = directCells(rows[r]);
+        let col = 0;
+        for (const td of cells) {
+            while ((reservedThrough.get(col) ?? -1) >= r) col += 1;   // masih ditahan rowspan baris sebelumnya
+            const span = numFrom(td.getAttribute("colspan"), 1);
+            const rspan = numFrom(td.getAttribute("rowspan"), 1);
+            /* sel kosong (padding/perataan visual, kerap dipakai baris header
+               terakhir) tidak boleh menimpa judul yang sudah ada di kolom itu */
+            const isi = tidyText(td.textContent);
+            for (let k = 0; k < span; k += 1) {
+                if (isi) colHeader.set(col + k, td);
+                reservedThrough.set(col + k, r + rspan - 1);
+            }
+            col += span;
+            if (col > GRID_MAX_COLS) break;
+        }
+    }
+
+    const totalCols = colHeader.size ? Math.max(...[...colHeader.keys()].map((k) => k + 1)) : 0;
+    if (!totalCols || totalCols > GRID_MAX_COLS) {
+        // pola tak wajar -> heuristik lama (satu baris header)
+        return { headerCells: directCells(rows[0]), headerRows: rows.slice(0, 1), bodyRows: rows.slice(1) };
+    }
+    const headerCells = [];
+    for (let c = 0; c < totalCols; c += 1) headerCells.push(colHeader.get(c) || null);
+    return { headerCells, headerRows: rows.slice(0, headerRowCount), bodyRows: rows.slice(headerRowCount) };
+}
+
 export const numFrom = (v, baku = 1) => {
     const n = parseInt(v, 10);
     return Number.isFinite(n) && n > 0 ? n : baku;
